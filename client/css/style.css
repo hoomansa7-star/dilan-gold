@@ -1,0 +1,263 @@
+/* Dilan Gold ERP - Modern Jewelry Workshop System (سامانه مدرن کارگاهی طلای دیلان) */
+
+/* Local Premium Persian Webfonts */
+@font-face {
+    font-family: 'Estedad';
+    src: url('../fonts/Estedad-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Estedad';
+    src: url('../fonts/Estedad-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Estedad';
+    src: url('../fonts/Estedad-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Estedad';
+    src: url('../fonts/Estedad-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Estedad';
+    src: url('../fonts/Estedad-ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lalezar';
+    src: url('../fonts/Lalezar-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --bg-page: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --bg-card-subtle: #F1F5F9;
+    --border-color: #E2E8F0;
+    --border-color-subtle: #CBD5E1;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --gold-primary: #D97706;
+    --gold-dark: #B45309;
+    --gold-light: #FEF3C7;
+    --accent-emerald: #059669;
+    --loss-red: #E11D48;
+    --loss-red-bg: #FFF1F2;
+    --loss-red-border: #FECDD3;
+}
+
+body.dark {
+    --bg-page: #0B0F17;
+    --bg-card: #151C28;
+    --bg-card-subtle: #1E293B;
+    --border-color: #2D3748;
+    --border-color-subtle: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
+    --gold-primary: #F59E0B;
+    --gold-dark: #FBBF24;
+    --gold-light: #2C2210;
+    --accent-emerald: #10B981;
+    --loss-red: #FB7185;
+    --loss-red-bg: #2A1215;
+    --loss-red-border: #4C1D24;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+    min-height: 100vh;
+    font-family: 'Estedad', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, .font-heading {
+    font-family: 'Lalezar', 'Estedad', sans-serif !important;
+    letter-spacing: 0;
+}
+
+/* Tabular Persian Numbers */
+.font-mono, .tnum, td.font-mono, span.font-mono, div.font-mono, button.font-mono, input.font-mono {
+    font-family: 'Estedad', monospace, sans-serif !important;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    font-weight: 700;
+}
+
+/* Modern Card */
+.dilan-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Inputs & Selects */
+.dilan-input, .dilan-select {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dilan-input:focus, .dilan-select:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+/* Modern Clean Table */
+.dilan-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.dilan-table th {
+    background-color: var(--bg-card-subtle);
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.dilan-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.88rem;
+    vertical-align: middle;
+}
+
+.dilan-table tbody tr:hover {
+    background-color: rgba(217, 119, 6, 0.03);
+}
+
+body.dark .dilan-table tbody tr:hover {
+    background-color: rgba(245, 158, 11, 0.05);
+}
+
+/* Loss Badges */
+.loss-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background-color: var(--loss-red-bg);
+    border: 1px solid var(--loss-red-border);
+    color: var(--loss-red);
+    font-weight: 800;
+    font-family: 'Estedad', monospace, sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+/* Worker Badges */
+.worker-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.worker-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: white;
+}
+
+.avatar-nima { background-color: #0284C7; }
+.avatar-amir { background-color: #D97706; }
+.avatar-ata { background-color: #7C3AED; }
+.avatar-other { background-color: #475569; }
+
+/* Stage Badges */
+.stage-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.stage-skin { background-color: #FEF3C7; color: #92400E; }
+.stage-polish { background-color: #DBEAFE; color: #1E40AF; }
+.stage-melting { background-color: #FFEDD5; color: #9A3412; }
+.stage-rolling { background-color: #F1F5F9; color: #334155; }
+.stage-laser { background-color: #F3E8FF; color: #6B21A8; }
+.stage-melgat { background-color: #CCFBF1; color: #115E59; }
+.stage-stripping { background-color: #E0F2FE; color: #075985; }
+.stage-swarf { background-color: #FFE4E6; color: #9F1239; }
+.stage-wire { background-color: #D1FAE5; color: #065F46; }
+
+body.dark .stage-skin { background-color: #382405; color: #FCD34D; }
+body.dark .stage-polish { background-color: #172554; color: #93C5FD; }
+body.dark .stage-melting { background-color: #431407; color: #FDBA74; }
+body.dark .stage-rolling { background-color: #1E293B; color: #CBD5E1; }
+body.dark .stage-laser { background-color: #3B0764; color: #D8B4FE; }
+body.dark .stage-melgat { background-color: #042F2E; color: #5EEAD4; }
+body.dark .stage-stripping { background-color: #082F49; color: #7DD3FC; }
+body.dark .stage-swarf { background-color: #4C0519; color: #FDA4AF; }
+body.dark .stage-wire { background-color: #022C22; color: #6EE7B7; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-page);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}

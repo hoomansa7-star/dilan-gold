@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه کارگاهی طلای دیلان | ردیابی کسری خط تولید</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <!-- Modern Clean Styles -->
+    <link rel="stylesheet" href="/static/css/style.css?v=5">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="p-3 md:p-6 space-y-4 max-w-7xl mx-auto">
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 left-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-auto"></div>
+
+    <!-- Header Bar (سربرگ مدرن سامانه دیلان) -->
+    <header class="dilan-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-amber-600 flex items-center justify-center font-heading text-white text-2xl shadow-sm">
+                د
+            </div>
+            <div>
+                <h1 class="text-xl font-heading text-[var(--text-primary)] leading-tight">
+                    کارگاه طلای دیلان
+                </h1>
+                <p class="text-xs text-[var(--text-muted)] font-medium">ردیابی وزن، کارگران و کنترل کسری ۹ مرحله تولید طلا</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
+            <!-- Current Date Badge -->
+            <div class="flex items-center gap-2 bg-[var(--bg-card-subtle)] border border-[var(--border-color)] px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--text-primary)]">
+                <i data-lucide="calendar" class="w-4 h-4 text-amber-600"></i>
+                <span>چهارشنبه ۲۹ مهر ۱۴۰۵</span>
+            </div>
+
+            <!-- Reconciliation Modal Trigger -->
+            <button onclick="openNightlyAuditModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
+                <i data-lucide="scale" class="w-4 h-4 text-emerald-600"></i>
+                <span>تطبیق تراز روز</span>
+            </button>
+
+            <!-- Export Excel -->
+            <button onclick="exportShiftExcel()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-amber-500 transition-all text-[var(--text-primary)]">
+                <i data-lucide="download" class="w-4 h-4 text-amber-600"></i>
+                <span>خروجی اکسل</span>
+            </button>
+
+            <!-- Dark Mode Toggle -->
+            <button onclick="toggleNightMode()" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-amber-500 transition-colors" title="حالت شب / روز">
+                <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs (۳ بخش اصلی و کاربردی) -->
+    <nav class="flex items-center gap-2 border-b border-[var(--border-color)] pb-1 overflow-x-auto">
+        <button onclick="switchMainTab('daily-ledger')" id="tab-btn-daily-ledger" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs bg-amber-600 text-white transition-all shadow-sm">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>۱. دفتر شیفت کارگاه (جریان روزانه)</span>
+        </button>
+        <button onclick="switchMainTab('workshop-matrix')" id="tab-btn-workshop-matrix" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            <span>۲. جدول مراحل تولید (طرح همکار)</span>
+        </button>
+        <button onclick="switchMainTab('melting-calc')" id="tab-btn-melting-calc" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all">
+            <i data-lucide="flame" class="w-4 h-4"></i>
+            <span>۳. ماشین‌حساب ذوب ۴ شمش و بار</span>
+        </button>
+    </nav>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: دفتر شیفت کارگاه (جریان واقعی روزانه منطبق بر نمونه کار ۱ و ۲) -->
+    <!-- ========================================================================= -->
+    <main id="tab-daily-ledger" class="space-y-4">
+        
+        <!-- 4 Essential Metrics Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="dilan-card p-4">
+                <span class="text-xs text-[var(--text-muted)] font-bold flex items-center justify-between">
+                    <span>طلای ورودی اول صبح (۷۵۰)</span>
+                    <i data-lucide="arrow-down-left" class="w-4 h-4 text-blue-600"></i>
+                </span>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span id="metric-in-gold" class="font-mono text-2xl font-black text-blue-900 dark:text-blue-300">۱۱۱.۸۸۰</span>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">گرم</span>
+                </div>
+                <span class="text-[11px] text-[var(--text-muted)] mt-1 block">۴ دسته کار تحویل‌شده</span>
+            </div>
+
+            <div class="dilan-card p-4">
+                <span class="text-xs text-[var(--text-muted)] font-bold flex items-center justify-between">
+                    <span>کارهای ساخته‌شده خروجی</span>
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                </span>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span id="metric-out-gold" class="font-mono text-2xl font-black text-emerald-700 dark:text-emerald-400">۱۰۶.۸۴۰</span>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">گرم</span>
+                </div>
+                <span class="text-[11px] text-[var(--text-muted)] mt-1 block">آماده تحویل به ویترین</span>
+            </div>
+
+            <div class="dilan-card p-4">
+                <span class="text-xs text-[var(--text-muted)] font-bold flex items-center justify-between">
+                    <span>سوآله و ضایعات (چرم)</span>
+                    <i data-lucide="archive" class="w-4 h-4 text-rose-500"></i>
+                </span>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span id="metric-swarf-gold" class="font-mono text-2xl font-black text-rose-700 dark:text-rose-400">۱.۱۰۰</span>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">گرم</span>
+                </div>
+                <span class="text-[11px] text-[var(--text-muted)] mt-1 block">۱ عدد انگشتر عطا (سایز ۳)</span>
+            </div>
+
+            <div class="dilan-card p-4 bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/50">
+                <span class="text-xs text-rose-700 dark:text-rose-400 font-bold flex items-center justify-between">
+                    <span>کسری کل شیفت امروز</span>
+                    <i data-lucide="trending-down" class="w-4 h-4 text-rose-600"></i>
+                </span>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span id="metric-total-loss" class="font-mono text-2xl font-black text-rose-700 dark:text-rose-400">-۳.۹۴۰</span>
+                    <span class="text-xs text-rose-700 dark:text-rose-400 font-bold">گرم</span>
+                </div>
+                <span class="text-[11px] text-[var(--text-muted)] mt-1 block">پوست و پرداخت + ذوب و ملگات</span>
+            </div>
+        </div>
+
+        <!-- Section 1: Morning Batches & Allocation (ورود اقلام و تقسیم کار صبح) -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="package" class="w-4 h-4 text-amber-600"></i>
+                    <h2 class="text-sm font-bold text-[var(--text-primary)]">
+                        ۱. دسته‌های کار ورودی اول صبح و تقسیم بین کارگران
+                    </h2>
+                </div>
+                <span class="text-xs text-[var(--text-muted)]">برگرفته از بالای صفحه ۱ دفترچه (۲۹ مهر)</span>
+            </div>
+
+            <!-- 4 Batches Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Batch 1: گل و نگین -->
+                <div class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold block text-[var(--text-primary)]">گل و نگین برای پوست</span>
+                            <span class="text-[11px] text-[var(--text-muted)]">سایز ۱ تا ۶ (جمع ۳۳ عدد)</span>
+                        </div>
+                        <span class="font-mono font-black text-sm text-blue-700 dark:text-blue-400">۲۶.۷۷۰ g</span>
+                    </div>
+                    <div class="text-[11px] bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)] space-y-1">
+                        <div class="flex justify-between">
+                            <span>نیما (۱۶ عدد):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۱۲.۵۱۰ g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>امیر (۱۷ عدد):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۱۴.۲۵۰ g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch 2: انگشتر و نگین -->
+                <div class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold block text-[var(--text-primary)]">انگشتر و نگین</span>
+                            <span class="text-[11px] text-[var(--text-muted)]">۱۱ ملگات شده + ۷ پوست خورده</span>
+                        </div>
+                        <span class="font-mono font-black text-sm text-blue-700 dark:text-blue-400">۲۳.۸۷۰ g</span>
+                    </div>
+                    <div class="text-[11px] bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)] space-y-1">
+                        <div class="flex justify-between">
+                            <span>نیما (سایز ۱ تا ۴):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۶.۹۱۰ g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>امیر (سایز ۱ تا ۴):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۸.۲۲۰ g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>عطا (سایز ۱ تا ۴):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۸.۷۱۰ g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch 3: انگشتر متفرقه -->
+                <div class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold block text-[var(--text-primary)]">انگشتر متفرقه</span>
+                            <span class="text-[11px] text-[var(--text-muted)]">جمع ۴ عدد قطعه خام</span>
+                        </div>
+                        <span class="font-mono font-black text-sm text-blue-700 dark:text-blue-400">۱۱.۹۰۰ g</span>
+                    </div>
+                    <div class="text-[11px] bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)] space-y-1">
+                        <div class="flex justify-between">
+                            <span>نیما (۲ عدد):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۵.۸۵۰ g</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>امیر (۲ عدد):</span>
+                            <span class="font-mono font-bold text-amber-700 dark:text-amber-400">۶.۰۴۰ g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch 4: تراش داخل -->
+                <div class="p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold block text-[var(--text-primary)]">گل و نگین برای تراش داخل</span>
+                            <span class="text-[11px] text-[var(--text-muted)]">وزن با یک مفتول تحویل عطا شد</span>
+                        </div>
+                        <span class="font-mono font-black text-sm text-blue-700 dark:text-blue-400">۴۹.۳۴۰ g</span>
+                    </div>
+                    <div class="text-[11px] bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)] flex items-center justify-between">
+                        <span>تحویل کامل به:</span>
+                        <span class="font-bold text-purple-700 dark:text-purple-400">عطا (۴۹.۳۴۰ g)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Quick Row Entry Form -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                <h3 class="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i>
+                    <span>ثبت سریع مرحله کاری در دفتر</span>
+                </h3>
+                <span class="text-[11px] text-[var(--text-muted)]">وزن ورودی و خروجی را وارد کنید تا کسری خودکار محاسبه شود</span>
+            </div>
+
+            <form onsubmit="handleQuickRowSubmit(event)" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2.5 items-end">
+                <div>
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">مرحله:</label>
+                    <select id="form-stage" class="dilan-select w-full" required>
+                        <option value="skin">پوست</option>
+                        <option value="polish">پرداخت</option>
+                        <option value="melting">ذوب</option>
+                        <option value="rolling">نورد</option>
+                        <option value="laser">لیزر</option>
+                        <option value="melgat">ملگات</option>
+                        <option value="stripping">لایه‌برداری</option>
+                        <option value="swarf">سوآله</option>
+                        <option value="wire_solder">لحیم و مفتول</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">کارگر:</label>
+                    <input id="form-worker" list="craftsmen-datalist" type="text" placeholder="نیما / امیر / عطا" class="dilan-input w-full" required>
+                    <datalist id="craftsmen-datalist">
+                        <option value="نیما">
+                        <option value="امیر">
+                        <option value="عطا">
+                    </datalist>
+                </div>
+                <div class="lg:col-span-2">
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">شرح کار و قطعه:</label>
+                    <input id="form-item" type="text" placeholder="مثلاً پوست گل و نگین" class="dilan-input w-full" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">تعداد:</label>
+                    <input id="form-count" type="number" min="1" value="1" class="dilan-input w-full font-mono text-center" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">وزن ورود (g):</label>
+                    <input id="form-weight-in" type="number" step="0.001" placeholder="0.000" oninput="calculateFormLiveLoss()" class="dilan-input w-full font-mono text-center" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[var(--text-muted)] mb-1">وزن خروج (g):</label>
+                    <input id="form-weight-out" type="number" step="0.001" placeholder="0.000" oninput="calculateFormLiveLoss()" class="dilan-input w-full font-mono text-center" required>
+                </div>
+                <div>
+                    <button type="submit" class="w-full h-[38px] rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1 transition-all">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span>ثبت سطر</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="flex items-center justify-between text-xs pt-1">
+                <span class="text-[var(--text-muted)]">پیش‌نمایش کسری لحظه‌ای:</span>
+                <span id="form-live-loss-badge" class="loss-badge text-xs font-bold">۰.۰۰۰ گرم</span>
+            </div>
+        </div>
+
+        <!-- Section 3: Master Shift Ledger Table -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-[var(--border-color)] pb-3">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-sm text-[var(--text-primary)]">
+                        ۲. جدول ثبت مراحل کاری شیفت (پوست، پرداخت، سوآله)
+                    </h3>
+                    <span id="table-row-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-amber-700 dark:text-amber-400">
+                        ۱۳ ردیف
+                    </span>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <div class="flex items-center gap-1 bg-[var(--bg-card-subtle)] border border-[var(--border-color)] p-1 rounded-lg">
+                        <span class="text-[10px] text-[var(--text-muted)] px-1 font-bold">فیلتر کارگر:</span>
+                        <button type="button" onclick="filterByWorker('all')" class="worker-filter-btn px-2 py-0.5 rounded font-bold bg-amber-600 text-white" data-worker="all">همه</button>
+                        <button type="button" onclick="filterByWorker('نیما')" class="worker-filter-btn px-2 py-0.5 rounded font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]" data-worker="نیما">نیما</button>
+                        <button type="button" onclick="filterByWorker('امیر')" class="worker-filter-btn px-2 py-0.5 rounded font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]" data-worker="امیر">امیر</button>
+                        <button type="button" onclick="filterByWorker('عطا')" class="worker-filter-btn px-2 py-0.5 rounded font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]" data-worker="عطا">عطا</button>
+                    </div>
+
+                    <select id="stage-filter-select" onchange="filterByStage(this.value)" class="dilan-select text-xs py-1 px-2">
+                        <option value="all">همه مراحل</option>
+                        <option value="skin">پوست</option>
+                        <option value="polish">پرداخت</option>
+                        <option value="swarf">سوآله</option>
+                        <option value="melting">ذوب</option>
+                        <option value="laser">لیزر</option>
+                    </select>
+
+                    <input id="search-filter-input" type="text" placeholder="جستجو..." oninput="filterBySearch(this.value)" class="dilan-input text-xs py-1 px-2.5 w-32">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="dilan-table">
+                    <thead>
+                        <tr>
+                            <th class="w-12 text-center">ردیف</th>
+                            <th class="w-20 text-center">ساعت</th>
+                            <th class="w-28 text-center">مرحله کارگاه</th>
+                            <th class="w-24">کارگر</th>
+                            <th>شرح قطعه و سایز</th>
+                            <th class="w-16 text-center">تعداد</th>
+                            <th class="w-24 text-center">وزن ورود (g)</th>
+                            <th class="w-24 text-center">وزن خروج (g)</th>
+                            <th class="w-28 text-center">کسری دقیق (g)</th>
+                            <th>توضیحات و رویداد دفتر</th>
+                            <th class="w-16 text-center">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workshop-ledger-tbody">
+                        <!-- Populated dynamically by app.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary Box at Bottom (دقیقاً کادر انتهای صفحه ۲ دفترچه دست‌نویس) -->
+            <div class="mt-4 pt-4 border-t-2 border-amber-500/30 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)]">
+                    <span class="block text-[var(--text-muted)] mb-1">کسری پوست و پرداخت (۳۱ انگشتر):</span>
+                    <span class="font-mono font-bold text-base text-rose-600">-۲.۴۱۰ گرم</span>
+                </div>
+                <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)]">
+                    <span class="block text-[var(--text-muted)] mb-1">کسر تخمینی ذوب و لایه‌برداری:</span>
+                    <span class="font-mono font-bold text-base text-rose-600">-۰.۵۰۰ گرم</span>
+                </div>
+                <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)]">
+                    <span class="block text-[var(--text-muted)] mb-1">تفکیک کسری کارگران:</span>
+                    <span class="font-mono text-xs block text-[var(--text-primary)]">نیما: ۱.۳۰۰- | امیر: ۲.۲۵۰- | عطا: ۰.۳۹۰-</span>
+                </div>
+                <div class="bg-rose-500/10 p-3 rounded-xl border border-rose-500/30">
+                    <span class="block font-bold text-rose-700 dark:text-rose-400 mb-1">کسری کل روزانه نهایی:</span>
+                    <span class="font-mono font-black text-xl text-rose-600 dark:text-rose-400">-۳.۹۴۰ گرم</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: جدول ماتریسی مراحل تولید کارگاه (منطبق بر طرح اولیه دست‌نویس همکار) -->
+    <!-- ========================================================================= -->
+    <section id="tab-workshop-matrix" class="space-y-4 hidden">
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2.5">
+                <div>
+                    <h2 class="text-sm font-bold text-[var(--text-primary)]">
+                        ماتریس کنترل کسری در مراحل ۹گانه کارگاه (ایده اولیه همکار)
+                    </h2>
+                    <p class="text-xs text-[var(--text-muted)]">جدول جامع ستونی جهت بررسی جریان پیوسته وزن از ذوب تا خروج نهایی</p>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                    فرمول‌های ۱۰ گانه همکار اعمال شد
+                </span>
+            </div>
+
+            <!-- Horizontal Matrix Grid of 10 Stages -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+                <!-- 1. ذوب -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                            <i data-lucide="flame" class="w-4 h-4"></i>
+                            <span>۱. ذوب و کسر بار</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۳۵۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        ورود ۴ شمش متفرقه $\rightarrow$ تبدیل به ۷۵۰ $\rightarrow$ محاسبه بار آلیاژ مس/نقره $\rightarrow$ کسر ذوب.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>ورود (با بار): ۲۵۰.۰۰۰ g</div>
+                        <div>خروج شمش: ۲۴۹.۶۵۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 2. نورد -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                            <i data-lucide="shrink" class="w-4 h-4"></i>
+                            <span>۲. نورد (تسمه/مفتول)</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۰۵۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۵ همکار: کسر نورد ناچیز است ولی در تیراژ بالا جمع می‌شود و ثبت آن الزامی است.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>ورود شمش: ۱۸۰.۰۰۰ g</div>
+                        <div>خروج تسمه: ۱۷۹.۹۵۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 3. لیزر -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1">
+                            <i data-lucide="crosshair" class="w-4 h-4"></i>
+                            <span>۳. برش لیزر</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۱۸۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۲ همکار: ثبت تعداد قطعه + وزن اولیه تسمه + وزن ثانویه قطعات بریده‌شده.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>تعداد قطعه: ۵۵ عدد</div>
+                        <div>کسر برش: -۰.۱۸۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 4. ملگات -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-teal-700 dark:text-teal-300 flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>۴. ملگات (جداسازی)</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۱۲۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۳ همکار: ملگات و لایه‌برداری دو مرحله کاملاً مستقل هستند و در دیتابیس جدا ثبت می‌شوند.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>ورود: ۵۰.۰۰۰ g</div>
+                        <div>خروج: ۴۹.۸۸۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 5. لایه‌برداری (اسید) -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-cyan-700 dark:text-cyan-300 flex items-center gap-1">
+                            <i data-lucide="flask-conical" class="w-4 h-4"></i>
+                            <span>۵. لایه‌برداری (اسید)</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۲۳۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        اسیدکاری نهایی و حذف شوره‌ها قبل از تحویل به دست کارگران جهت پوست و پرداخت.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>ورود: ۴۵.۰۰۰ g</div>
+                        <div>خروج: ۴۴.۷۷۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 6. پوست -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                            <span>۶. پوست (کارگران)</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۱.۷۳۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        ثبت وزن ورودی و خروجی به تفکیک نیما، امیر و عطا (مطابق نمونه کار ۲).
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>نیما: -۰.۶۶۰ | امیر: -۱.۰۷۰</div>
+                    </div>
+                </div>
+
+                <!-- 7. پرداخت -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1">
+                            <i data-lucide="gem" class="w-4 h-4"></i>
+                            <span>۷. پرداخت (نهایی)</span>
+                        </span>
+                        <span class="loss-badge text-[11px]">-۰.۶۸۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        مرحله نهایی پرداخت با گیلانس و فرچه قبل از تحویل به ویترین گالری.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>نیما: -۰.۲۳۰ | امیر: -۰.۲۷۰ | عطا: -۰.۱۸۰</div>
+                    </div>
+                </div>
+
+                <!-- 8. سوآله و جرم -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1">
+                            <i data-lucide="archive" class="w-4 h-4"></i>
+                            <span>۸. جرم و سوآله</span>
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600">+۱.۱۰۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۴ و ۹ همکار: انتقال ضایعات به ظرف سوآله و بررسی طلای ثبت‌نشده یا کسر غیرمتصل.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>انگشتر سایز ۳ عطا: ۱.۱۰۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 9. لحیم و مفتول -->
+                <div class="p-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] space-y-2">
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-1.5">
+                        <span class="font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                            <i data-lucide="link" class="w-4 h-4"></i>
+                            <span>۹. لحیم و مفتول</span>
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600">+۰.۳۰۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۱۰ همکار: اضافه شدن لحیم به کارها یکبار خروج می‌خورد و ورود آن تدریجی است.
+                    </p>
+                    <div class="bg-[var(--bg-card-subtle)] p-2 rounded-lg font-mono text-[11px] space-y-1">
+                        <div>افزایش به کارها: ۰.۳۰۰ g</div>
+                    </div>
+                </div>
+
+                <!-- 10. کسر کل روزانه -->
+                <div class="p-3.5 rounded-xl border-2 border-rose-500/40 bg-rose-50/50 dark:bg-rose-950/20 space-y-2">
+                    <div class="flex items-center justify-between border-b border-rose-200 pb-1.5">
+                        <span class="font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1">
+                            <i data-lucide="check-check" class="w-4 h-4"></i>
+                            <span>۱۰. کسر کل روز</span>
+                        </span>
+                        <span class="loss-badge font-mono text-xs font-black">-۳.۹۴۰ g</span>
+                    </div>
+                    <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                        بند ۸ همکار: جمع جبری کسری تمامی مراحل بالا بدون ابهام و با کنترل تطبیق شبانه.
+                    </p>
+                    <div class="bg-[var(--bg-card)] p-2 rounded-lg font-mono text-[11px] font-bold text-rose-700 dark:text-rose-400">
+                        تراز شیفت: -۳.۹۴۰ گرم
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: ماشین‌حساب ذوب ۴ شمش و کسر بار (بند ۱ دست‌نویس همکار) -->
+    <!-- ========================================================================= -->
+    <section id="tab-melting-calc" class="space-y-4 hidden">
+        <div class="dilan-card p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+                <div>
+                    <h2 class="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                        <i data-lucide="flame" class="w-5 h-5 text-amber-600"></i>
+                        <span>ماشین‌حساب تخصصی ذوب و کسر بار (بند ۱ همکار)</span>
+                    </h2>
+                    <p class="text-xs text-[var(--text-muted)] mt-1">
+                        فرمول همکار: ورود همزمان ۴ شمش با عیارهای مختلف $\rightarrow$ تبدیل خودکار به ۷۵۰ $\rightarrow$ محاسبه بار آلیاژ (مس/نقره) $\rightarrow$ محاسبه کسر ذوب.
+                    </p>
+                </div>
+                <button type="button" onclick="addIngotRow()" class="px-3 py-1.5 rounded-lg border border-amber-600 text-amber-700 dark:text-amber-400 text-xs font-bold flex items-center gap-1 hover:bg-amber-500/10 transition-colors">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>افزودن شمش جدید</span>
+                </button>
+            </div>
+
+            <!-- Ingot Inputs Table -->
+            <div class="overflow-x-auto">
+                <table class="dilan-table">
+                    <thead>
+                        <tr>
+                            <th class="w-12 text-center">شمش</th>
+                            <th>شرح شمش یا آبشده</th>
+                            <th class="w-32 text-center">وزن خام (g)</th>
+                            <th class="w-28 text-center">عیار ورودی</th>
+                            <th class="w-36 text-center">وزن معادل ۷۵۰ (g)</th>
+                            <th class="w-16 text-center">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="multi-ingots-tbody">
+                        <!-- Populated by app.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Results Summary Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[var(--bg-card-subtle)] p-4 rounded-xl border border-[var(--border-color)]">
+                <div>
+                    <span class="block text-xs text-[var(--text-muted)] mb-1">۱. سرجمع وزن خام شمش‌ها:</span>
+                    <span id="melt-total-raw" class="font-mono font-black text-lg text-blue-900 dark:text-blue-300">۰.۰۰۰ گرم</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-[var(--text-muted)] mb-1">۲. سرجمع معادل عیار ۷۵۰:</span>
+                    <span id="melt-total-750" class="font-mono font-black text-lg text-amber-700 dark:text-amber-400">۰.۰۰۰ گرم</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-[var(--text-muted)] mb-1">۳. بار مس/نقره لازم جهت رسیدن به ۷۵۰:</span>
+                    <span id="melt-alloy-needed" class="font-mono font-black text-lg text-emerald-700 dark:text-emerald-400">۰.۰۰۰ گرم</span>
+                </div>
+            </div>
+
+            <!-- Output Ingot & Loss Calculation -->
+            <div class="p-4 rounded-xl border border-amber-500/30 bg-amber-50/30 dark:bg-amber-950/20 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-[var(--text-primary)] mb-1">
+                        وزن شمش خروجی بعد از ذوب را وارد کنید (گرم):
+                    </label>
+                    <input id="melt-output-weight" type="number" step="0.001" placeholder="مثلاً ۲۴۸.۵۰۰" oninput="calculateMeltingLoss()" class="dilan-input w-full font-mono text-base font-bold">
+                    <span class="text-[11px] text-[var(--text-muted)] mt-1 block">
+                        فرمول: کسر ذوب = (وزن معادل ۷۵۰ + بار مس) − وزن شمش بعد ذوب
+                    </span>
+                </div>
+                <div class="flex flex-col items-start md:items-end">
+                    <span class="text-xs font-bold text-[var(--text-muted)] mb-1">کسر ذوب حاصل:</span>
+                    <span id="melt-loss-badge" class="loss-badge text-base font-black">-۰.۳۵۰ گرم</span>
+                    <button type="button" onclick="applyMeltingToLedger()" class="mt-2 px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-lg shadow-sm transition-all">
+                        ثبت این ذوب در دفتر کارگاه
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: Nightly Audit & Safe Reconciliation (تطبیق پایان روز و کنترل طلای مفقودی) -->
+    <div id="modal-audit" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="scale" class="w-5 h-5 text-emerald-600"></i>
+                    <h3 class="font-heading text-lg text-[var(--text-primary)]">تطبیق تراز پایان شیفت (بند ۹ همکار)</h3>
+                </div>
+                <button onclick="closeNightlyAuditModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <p class="text-xs text-[var(--text-muted)] leading-relaxed">
+                فرمول بند ۹ همکار: مقایسه طلای تحویلی اول صبح با کارهای ساخته‌شده، سوآله‌ها و کسر مجاز، جهت اطمینان از عدم مفقودی حتی یک سوت طلا.
+            </p>
+
+            <div class="space-y-2.5 bg-[var(--bg-card-subtle)] p-3.5 rounded-xl border border-[var(--border-color)] text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">طلای تحویلی اول صبح (۷۵۰):</span>
+                    <input id="audit-in-gold" type="number" step="0.001" value="111.880" oninput="runGoldAuditCheck()" class="w-28 p-1.5 rounded border border-[var(--border-color)] font-mono text-center dilan-input">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">کارهای ساخته‌شده خروجی:</span>
+                    <input id="audit-out-gold" type="number" step="0.001" value="106.840" oninput="runGoldAuditCheck()" class="w-28 p-1.5 rounded border border-[var(--border-color)] font-mono text-center dilan-input">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">سوآله‌های جمع‌آوری‌شده (چرم):</span>
+                    <input id="audit-swarf-gold" type="number" step="0.001" value="1.100" oninput="runGoldAuditCheck()" class="w-28 p-1.5 rounded border border-[var(--border-color)] font-mono text-center dilan-input">
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">کسری مجاز مراحل کارگاه:</span>
+                    <input id="audit-loss-gold" type="number" step="0.001" value="3.940" oninput="runGoldAuditCheck()" class="w-28 p-1.5 rounded border border-[var(--border-color)] font-mono text-center dilan-input">
+                </div>
+            </div>
+
+            <div id="audit-res-box" class="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs">
+                <div class="flex justify-between items-center font-bold">
+                    <span class="text-emerald-800 dark:text-emerald-300">کسری غیرمتصل (طلای مفقودی):</span>
+                    <span id="audit-unconnected-val" class="font-mono text-sm text-emerald-800 dark:text-emerald-300 font-black">۰.۰۰۰ گرم</span>
+                </div>
+                <p id="audit-status-msg" class="text-[11px] text-[var(--text-muted)] mt-1 leading-normal">
+                    تراز کارگاه ۱۰۰٪ متصل و بسته است؛ هیچ طلای مفقودی در شیفت وجود ندارد.
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeNightlyAuditModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">بستن</button>
+                <button onclick="runGoldAuditCheck()" class="px-4 py-2 text-xs rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold">محاسبه مجدد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logic -->
+    <script src="/static/js/app.js?v=5"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

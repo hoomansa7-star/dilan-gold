@@ -1,5 +1,5 @@
 @echo off
+chcp 65001 >nul
 cd /d "%~dp0"
-start "" http://127.0.0.1:8000
-".venv\Scripts\python.exe" -m uvicorn server.main:app --host 127.0.0.1 --port 8000
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\launch.ps1"
 if %ERRORLEVEL% neq 0 pause

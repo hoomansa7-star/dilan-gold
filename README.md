@@ -1,5 +1,7 @@
 # نرم‌افزار جامع مدیریت خط تولید، حسابداری و ویترین طلای دیلان (Dilan Gold ERP)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/hoomansa7-star/dilan-gold)
+
 این نرم‌افزار به صورت اختصاصی بر اساس فرآیندهای واقعی کارگاه و گالری طلای **دیلان (Dilan Gold)** و مطابق با دفاتر ثبت روزانه و فرمول‌های کسری طلا طراحی و پیاده‌سازی شده است.
 
 ---

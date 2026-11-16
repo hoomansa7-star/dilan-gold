@@ -1,9 +1,17 @@
 {
-  "version": 2,
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index.py"
+      "destination": {
+        "type": "service",
+        "service": "dilan-gold-erp"
+      }
     }
-  ]
+  ],
+  "services": {
+    "dilan-gold-erp": {
+      "root": ".",
+      "entrypoint": "api/index.py"
+    }
+  }
 }

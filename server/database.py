@@ -31,8 +31,18 @@ DB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
 BACKUP_DIR = os.path.join(DB_DIR, "backups")
 DB_PATH = os.path.join(DB_DIR, "dilan_gold.db")
 
-os.makedirs(DB_DIR, exist_ok=True)
-os.makedirs(BACKUP_DIR, exist_ok=True)
+try:
+    os.makedirs(DB_DIR, exist_ok=True)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+except OSError:
+    # Serverless environment (Vercel / Lambda) where root is read-only
+    DB_DIR = "/tmp"
+    BACKUP_DIR = "/tmp/backups"
+    DB_PATH = "/tmp/dilan_gold.db"
+    try:
+        os.makedirs(BACKUP_DIR, exist_ok=True)
+    except OSError:
+        pass
 
 
 def get_database_url() -> Optional[str]:

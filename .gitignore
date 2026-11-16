@@ -24,3 +24,6 @@ Thumbs.db
 desktop.ini
 *.exe
 cloudflared.exe
+
+.vercel
+.env*

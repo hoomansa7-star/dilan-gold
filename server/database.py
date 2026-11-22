@@ -396,6 +396,79 @@ def init_db() -> None:
         );
         """)
 
+        # 15. Craftsmen Settlements / Wage Payroll (تسویه حساب و کارکرد پرسنل)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS craftsmen_settlements (
+            id SERIAL PRIMARY KEY,
+            craftsman_id INTEGER NOT NULL REFERENCES craftsmen(id) ON DELETE CASCADE,
+            date_shamsi TEXT NOT NULL,
+            period_title TEXT NOT NULL,
+            total_worked_grams DOUBLE PRECISION DEFAULT 0.0,
+            wage_rate_irr DOUBLE PRECISION DEFAULT 0.0,
+            total_wage_irr DOUBLE PRECISION DEFAULT 0.0,
+            paid_amount_irr DOUBLE PRECISION DEFAULT 0.0,
+            paid_gold_weight DOUBLE PRECISION DEFAULT 0.0,
+            settlement_status TEXT DEFAULT 'تسویه_شده',
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 16. Crucible Records (دفترچه تخصصی بوته‌های ذوب و شیره)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS crucible_records (
+            id SERIAL PRIMARY KEY,
+            date_shamsi TEXT NOT NULL,
+            crucible_code TEXT NOT NULL,
+            operator_name TEXT DEFAULT 'مسئول ذوب',
+            raw_gold_weight DOUBLE PRECISION NOT NULL,
+            raw_carat INTEGER NOT NULL,
+            target_carat INTEGER DEFAULT 750,
+            alloy_bar_added DOUBLE PRECISION DEFAULT 0.0,
+            melted_bar_weight DOUBLE PRECISION NOT NULL,
+            sheereh_weight DOUBLE PRECISION DEFAULT 0.0,
+            loss_weight DOUBLE PRECISION NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 17. Solder Recipes (فرمول‌های ساخت انواع لحیم زرگری)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS solder_recipes (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL UNIQUE,
+            solder_type TEXT NOT NULL,
+            base_gold_weight DOUBLE PRECISION NOT NULL,
+            base_carat INTEGER DEFAULT 750,
+            cadmium_percent DOUBLE PRECISION NOT NULL,
+            cadmium_weight DOUBLE PRECISION NOT NULL,
+            silver_weight DOUBLE PRECISION DEFAULT 0.0,
+            copper_weight DOUBLE PRECISION DEFAULT 0.0,
+            total_solder_weight DOUBLE PRECISION NOT NULL,
+            final_carat INTEGER NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 18. Refining Batches (محموله‌های ارسالی به قالکاری و تیزاب‌کاری)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS refining_batches (
+            id SERIAL PRIMARY KEY,
+            date_shamsi TEXT NOT NULL,
+            batch_code TEXT NOT NULL UNIQUE,
+            refiner_name TEXT NOT NULL,
+            material_type TEXT DEFAULT 'سوآله چرم و سوهان',
+            sent_weight DOUBLE PRECISION NOT NULL,
+            recovered_gold_750 DOUBLE PRECISION DEFAULT 0.0,
+            refining_fee_irr DOUBLE PRECISION DEFAULT 0.0,
+            status TEXT DEFAULT 'در_حال_تیزاب',
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
         # Seeds for PostgreSQL
         default_craftsmen = [
             ("نیما", "استادکار پوست و پرداخت", "09120000001"),
@@ -413,12 +486,18 @@ def init_db() -> None:
             ("آقای آزادی", "تامین‌کننده شمش و بنکدار طلا", "09121111111", 0.0, 0.0),
             ("ربیعی", "تامین‌کننده اسید و تجهیزات کارگاه", "09122222222", 0.0, 0.0),
         ]
-        for name, role, phone, b_gold, b_irr in default_parties:
+        # Seed Solder Recipes (فرمول‌های پیش‌فرض لحیم زرگری)
+        default_solders = [
+            ("لحیم سفت (جوش اولیه و قطعات سنگین)", "hard", 10.0, 750, 4.0, 0.40, 0.30, 0.10, 10.80, 740, "مناسب اتصالات اصلی، حلقه و بازوی انگشتر با دمای ذوب بالا"),
+            ("لحیم متوسط (کارهای عمومی کارگاه)", "medium", 10.0, 750, 7.0, 0.70, 0.50, 0.20, 11.40, 730, "مناسب جوشکاری النگو، انگشتر و قطعات ریخته‌گری"),
+            ("لحیم شل (کارهای ظریف و گل و نگین)", "soft", 10.0, 750, 11.0, 1.10, 0.80, 0.30, 12.20, 715, "دمای ذوب پایین بدون تغییر شکل قطعه و ریزش جوش قبلی"),
+        ]
+        for title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes in default_solders:
             cursor.execute("""
-            INSERT INTO accounts_counterparties (name, role, phone, balance_gold_750, balance_irr)
-            VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT (name) DO NOTHING;
-            """, (name, role, phone, b_gold, b_irr))
+            INSERT INTO solder_recipes (title, solder_type, base_gold_weight, base_carat, cadmium_percent, cadmium_weight, silver_weight, copper_weight, total_solder_weight, final_carat, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (title) DO NOTHING;
+            """, (title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes))
 
     else:
         # SQLite DDL
@@ -637,6 +716,80 @@ def init_db() -> None:
         );
         """)
 
+        # 15. Craftsmen Settlements / Wage Payroll (تسویه حساب و کارکرد پرسنل)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS craftsmen_settlements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            craftsman_id INTEGER NOT NULL,
+            date_shamsi TEXT NOT NULL,
+            period_title TEXT NOT NULL,
+            total_worked_grams REAL DEFAULT 0.0,
+            wage_rate_irr REAL DEFAULT 0.0,
+            total_wage_irr REAL DEFAULT 0.0,
+            paid_amount_irr REAL DEFAULT 0.0,
+            paid_gold_weight REAL DEFAULT 0.0,
+            settlement_status TEXT DEFAULT 'تسویه_شده',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(craftsman_id) REFERENCES craftsmen(id) ON DELETE CASCADE
+        );
+        """)
+
+        # 16. Crucible Records (دفترچه تخصصی بوته‌های ذوب و شیره)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS crucible_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_shamsi TEXT NOT NULL,
+            crucible_code TEXT NOT NULL,
+            operator_name TEXT DEFAULT 'مسئول ذوب',
+            raw_gold_weight REAL NOT NULL,
+            raw_carat INTEGER NOT NULL,
+            target_carat INTEGER DEFAULT 750,
+            alloy_bar_added REAL DEFAULT 0.0,
+            melted_bar_weight REAL NOT NULL,
+            sheereh_weight REAL DEFAULT 0.0,
+            loss_weight REAL NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 17. Solder Recipes (فرمول‌های ساخت انواع لحیم زرگری)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS solder_recipes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL UNIQUE,
+            solder_type TEXT NOT NULL,
+            base_gold_weight REAL NOT NULL,
+            base_carat INTEGER DEFAULT 750,
+            cadmium_percent REAL NOT NULL,
+            cadmium_weight REAL NOT NULL,
+            silver_weight REAL DEFAULT 0.0,
+            copper_weight REAL DEFAULT 0.0,
+            total_solder_weight REAL NOT NULL,
+            final_carat INTEGER NOT NULL,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 18. Refining Batches (محموله‌های ارسالی به قالکاری و تیزاب‌کاری)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS refining_batches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_shamsi TEXT NOT NULL,
+            batch_code TEXT NOT NULL UNIQUE,
+            refiner_name TEXT NOT NULL,
+            material_type TEXT DEFAULT 'سوآله چرم و سوهان',
+            sent_weight REAL NOT NULL,
+            recovered_gold_750 REAL DEFAULT 0.0,
+            refining_fee_irr REAL DEFAULT 0.0,
+            status TEXT DEFAULT 'در_حال_تیزاب',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
         # Seeds for SQLite
         default_craftsmen = [
             ("نیما", "استادکار پوست و پرداخت", "09120000001"),
@@ -658,6 +811,18 @@ def init_db() -> None:
             INSERT OR IGNORE INTO accounts_counterparties (name, role, phone, balance_gold_750, balance_irr)
             VALUES (?, ?, ?, ?, ?);
             """, (name, role, phone, b_gold, b_irr))
+
+        # Seed Solder Recipes for SQLite
+        default_solders = [
+            ("لحیم سفت (جوش اولیه و قطعات سنگین)", "hard", 10.0, 750, 4.0, 0.40, 0.30, 0.10, 10.80, 740, "مناسب اتصالات اصلی، حلقه و بازوی انگشتر با دمای ذوب بالا"),
+            ("لحیم متوسط (کارهای عمومی کارگاه)", "medium", 10.0, 750, 7.0, 0.70, 0.50, 0.20, 11.40, 730, "مناسب جوشکاری النگو، انگشتر و قطعات ریخته‌گری"),
+            ("لحیم شل (کارهای ظریف و گل و نگین)", "soft", 10.0, 750, 11.0, 1.10, 0.80, 0.30, 12.20, 715, "دمای ذوب پایین بدون تغییر شکل قطعه و ریزش جوش قبلی"),
+        ]
+        for title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes in default_solders:
+            cursor.execute("""
+            INSERT OR IGNORE INTO solder_recipes (title, solder_type, base_gold_weight, base_carat, cadmium_percent, cadmium_weight, silver_weight, copper_weight, total_solder_weight, final_carat, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """, (title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes))
 
     conn.commit()
     conn.close()

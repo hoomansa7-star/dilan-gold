@@ -61,19 +61,31 @@
         </div>
     </header>
 
-    <!-- Main Navigation Tabs (۳ بخش اصلی و کاربردی) -->
+    <!-- Main Navigation Tabs (سامانه جامع ۶ بخشی کارگاه طلای دیلان) -->
     <nav class="flex items-center gap-2 border-b border-[var(--border-color)] pb-1 overflow-x-auto">
-        <button onclick="switchMainTab('daily-ledger')" id="tab-btn-daily-ledger" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs bg-amber-600 text-white transition-all shadow-sm">
+        <button onclick="switchMainTab('daily-ledger')" id="tab-btn-daily-ledger" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs bg-amber-600 text-white transition-all shadow-sm shrink-0">
             <i data-lucide="book-open" class="w-4 h-4"></i>
             <span>۱. دفتر شیفت کارگاه (جریان روزانه)</span>
         </button>
-        <button onclick="switchMainTab('workshop-matrix')" id="tab-btn-workshop-matrix" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all">
+        <button onclick="switchMainTab('workshop-matrix')" id="tab-btn-workshop-matrix" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="layout-grid" class="w-4 h-4"></i>
             <span>۲. جدول مراحل تولید (طرح همکار)</span>
         </button>
-        <button onclick="switchMainTab('melting-calc')" id="tab-btn-melting-calc" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all">
+        <button onclick="switchMainTab('bench-quickpad')" id="tab-btn-bench-quickpad" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+            <span>۳. ثبت سریع پای میز کار (Bench Pad)</span>
+        </button>
+        <button onclick="switchMainTab('melting-calc')" id="tab-btn-melting-calc" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="flame" class="w-4 h-4"></i>
-            <span>۳. ماشین‌حساب ذوب ۴ شمش و بار</span>
+            <span>۴. ماشین‌حساب ذوب ۴ شمش و بار</span>
+        </button>
+        <button onclick="switchMainTab('craftsmen-payroll')" id="tab-btn-craftsmen-payroll" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
+            <span>۵. کارکرد و تسویه پرسنل</span>
+        </button>
+        <button onclick="switchMainTab('crucible-refining')" id="tab-btn-crucible-refining" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="beaker" class="w-4 h-4"></i>
+            <span>۶. بوته، لحیم و قالکاری</span>
         </button>
     </nav>
 
@@ -651,6 +663,622 @@
             </div>
         </div>
     </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: ثبت سریع پای میز کار (BENCH QUICK-PAD) -->
+    <!-- ========================================================================= -->
+    <section id="tab-bench-quickpad" class="space-y-4 hidden">
+        <div class="dilan-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-gradient-to-l from-amber-500/10 via-[var(--bg-card)] to-[var(--bg-card)] border-r-4 border-amber-600">
+            <div>
+                <h2 class="text-base font-heading text-[var(--text-primary)] flex items-center gap-2">
+                    <i data-lucide="zap" class="w-5 h-5 text-amber-600"></i>
+                    <span>ثبت سریع پای میز کار (Ultra-Fast Bench Pad)</span>
+                </h2>
+                <p class="text-xs text-[var(--text-muted)] mt-1">
+                    طراحی‌شده برای تبلت و گوشی موبایل استادکاران با کمترین میزان تایپ، انتخاب سریع با لمس و محاسبه آنی کسری به سوت
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-lg font-bold">
+                    دقت ۳ رقم اعشار (سوت)
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Form Left: 8 cols -->
+            <div class="lg:col-span-8 dilan-card p-5 space-y-4">
+                <!-- 1. Select Craftsman -->
+                <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-2">۱. انتخاب استادکار / کارگر:</label>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="bench-craftsmen-btns">
+                        <button type="button" onclick="selectBenchCraftsman(1, 'نیما', this)" class="bench-c-btn p-3 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-bold text-sm flex flex-col items-center gap-1 transition-all">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span>نیما</span>
+                            <span class="text-[10px] text-[var(--text-muted)] font-normal">پوست و پرداخت</span>
+                        </button>
+                        <button type="button" onclick="selectBenchCraftsman(2, 'امیر', this)" class="bench-c-btn p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)] font-bold text-sm flex flex-col items-center gap-1 hover:border-amber-500 transition-all">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span>امیر</span>
+                            <span class="text-[10px] text-[var(--text-muted)] font-normal">پوست و پرداخت</span>
+                        </button>
+                        <button type="button" onclick="selectBenchCraftsman(3, 'عطا', this)" class="bench-c-btn p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] text-[var(--text-primary)] font-bold text-sm flex flex-col items-center gap-1 hover:border-amber-500 transition-all">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span>عطا</span>
+                            <span class="text-[10px] text-[var(--text-muted)] font-normal">النگو و انگشتر</span>
+                        </button>
+                        <button type="button" onclick="promptAddCraftsman()" class="p-3 rounded-xl border border-dashed border-[var(--border-color)] text-[var(--text-muted)] font-bold text-xs flex flex-col items-center justify-center gap-1 hover:border-amber-500 transition-all">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                            <span>استادکار جدید</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Select Stage -->
+                <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-2">۲. مرحله کارگاه:</label>
+                    <div class="flex flex-wrap gap-2" id="bench-stage-btns">
+                        <button type="button" onclick="selectBenchStage('skin', this)" class="bench-s-btn px-4 py-2 rounded-xl border-2 border-amber-500 bg-amber-500/10 font-bold text-xs text-amber-900 dark:text-amber-200">پوست</button>
+                        <button type="button" onclick="selectBenchStage('polish', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">پرداخت</button>
+                        <button type="button" onclick="selectBenchStage('melgat', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">ملگات</button>
+                        <button type="button" onclick="selectBenchStage('stripping', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">لایه‌برداری / اسید</button>
+                        <button type="button" onclick="selectBenchStage('laser', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">تراش و لیزر</button>
+                        <button type="button" onclick="selectBenchStage('melting', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">ذوب</button>
+                        <button type="button" onclick="selectBenchStage('rolling', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">نورد و چرخ</button>
+                        <button type="button" onclick="selectBenchStage('wire_solder', this)" class="bench-s-btn px-4 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card-subtle)] font-bold text-xs hover:border-amber-500">لحیم و مونتاژ</button>
+                    </div>
+                </div>
+
+                <!-- 3. Item Name & Count -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">۳. عنوان کار یا محصول:</label>
+                        <input id="bench-item-name" type="text" list="bench-item-presets" placeholder="مثلاً: پوست و ملگات گل" value="پوست و ملگات گل" class="w-full p-2.5 rounded-xl border border-[var(--border-color)] font-bold text-sm dilan-input">
+                        <datalist id="bench-item-presets">
+                            <option value="پوست و ملگات گل (سایز ۱ تا ۶)">
+                            <option value="پوست انگشتر متفرقه">
+                            <option value="پوست النگو و نگین">
+                            <option value="پرداخت انگشتر متفرقه">
+                            <option value="پرداخت انگشتر و نگین">
+                            <option value="پلاک و زنجیر">
+                            <option value="گوشواره ریخته‌گری">
+                        </datalist>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">تعداد قطعه:</label>
+                        <input id="bench-item-count" type="number" min="1" value="1" class="w-full p-2.5 rounded-xl border border-[var(--border-color)] font-mono font-bold text-center text-sm dilan-input">
+                    </div>
+                </div>
+
+                <!-- 4. Weights & Auto Loss Calculation -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[var(--bg-card-subtle)] p-4 rounded-xl border border-[var(--border-color)]">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-700 dark:text-blue-400 mb-1">
+                            وزن تحویلی به میز (ورودی - گرم):
+                        </label>
+                        <input id="bench-in-weight" type="number" step="0.001" placeholder="۰.۰۰۰" oninput="calculateBenchLoss()" class="w-full p-3 rounded-xl border border-blue-300 dark:border-blue-900 font-mono font-black text-lg text-blue-900 dark:text-blue-200 dilan-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                            وزن تحویل‌گرفته بعد کار (خروجی - گرم):
+                        </label>
+                        <input id="bench-out-weight" type="number" step="0.001" placeholder="۰.۰۰۰" oninput="calculateBenchLoss()" class="w-full p-3 rounded-xl border border-emerald-300 dark:border-emerald-900 font-mono font-black text-lg text-emerald-900 dark:text-emerald-200 dilan-input">
+                    </div>
+                </div>
+
+                <!-- 5. Swarf Diversion -->
+                <div class="p-3.5 rounded-xl border border-dashed border-[var(--border-color)] bg-[var(--bg-card)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="bench-has-swarf" onchange="toggleBenchSwarfInput()" class="w-4 h-4 rounded text-amber-600">
+                        <label for="bench-has-swarf" class="text-xs font-bold text-[var(--text-primary)] cursor-pointer">
+                            آیا قطعه یا خاکه‌ای مستقیماً به سوآله کارگاه منتقل شد؟ (مانند انگشتر سایز ۳ عطا)
+                        </label>
+                    </div>
+                    <div id="bench-swarf-input-wrap" class="hidden flex items-center gap-2 w-full sm:w-auto">
+                        <span class="text-xs text-[var(--text-muted)] font-bold">وزن ارسالی به سوآله:</span>
+                        <input id="bench-swarf-weight" type="number" step="0.001" placeholder="۱.۱۰۰" oninput="calculateBenchLoss()" class="w-24 p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-xs dilan-input">
+                        <span class="text-xs text-[var(--text-muted)]">گرم</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">یادداشت کارگاه:</label>
+                    <input id="bench-notes" type="text" placeholder="توضیحات اختیاری، عیار، سایزها یا نام مشتری..." class="w-full p-2 rounded-xl border border-[var(--border-color)] text-xs dilan-input">
+                </div>
+            </div>
+
+            <!-- Right Side: Live Metrics & Action (4 cols) -->
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                <div class="dilan-card p-5 space-y-4 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-[var(--text-muted)] mb-3">محاسبه آنی کسری سوت (Live Loss):</h3>
+                        
+                        <div id="bench-loss-display-box" class="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-[var(--bg-card-subtle)] text-center space-y-1">
+                            <span class="text-xs font-bold text-[var(--text-muted)] block">میزان کسری این مرحله:</span>
+                            <div id="bench-loss-value" class="font-mono text-2xl font-black text-[var(--text-primary)]">
+                                ۰.۰۰۰- گرم
+                            </div>
+                            <span id="bench-loss-desc" class="text-[11px] text-[var(--text-muted)] block">
+                                (۰ سوت طلا)
+                            </span>
+                        </div>
+
+                        <div class="mt-4 space-y-2 text-xs">
+                            <div class="flex justify-between py-1 border-b border-[var(--border-color)]">
+                                <span class="text-[var(--text-muted)]">استادکار منتخب:</span>
+                                <span id="bench-selected-craftsman-label" class="font-bold">نیما</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-[var(--border-color)]">
+                                <span class="text-[var(--text-muted)]">مرحله انتخابی:</span>
+                                <span id="bench-selected-stage-label" class="font-bold">پوست</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-[var(--border-color)]">
+                                <span class="text-[var(--text-muted)]">وضعیت اتصال:</span>
+                                <span class="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    ثبت مستقیم در دیتابیس ابری
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="button" onclick="submitBenchQuickTask()" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-heading text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span>ثبت قطعی در دفتر کارگاه</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 5: کارکرد و تسویه حساب پرسنل (CRAFTSMEN PAYROLL & SETTLEMENTS) -->
+    <!-- ========================================================================= -->
+    <section id="tab-craftsmen-payroll" class="space-y-4 hidden">
+        <div class="dilan-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-r-4 border-emerald-600">
+            <div>
+                <h2 class="text-base font-heading text-[var(--text-primary)] flex items-center gap-2">
+                    <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-emerald-600"></i>
+                    <span>کارکرد، اجرت و تسویه حساب پرسنل (Craftsmen Wage & Payroll)</span>
+                </h2>
+                <p class="text-xs text-[var(--text-muted)] mt-1">
+                    محاسبه خودکار اجرت ساخت بر اساس گرم‌های تحویلی، کنترل درصد کسری هر استادکار و صدور فیش تسویه حساب
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="loadCraftsmenPayroll()" class="px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-bold flex items-center gap-1 hover:border-amber-500">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>بروزرسانی داده‌ها</span>
+                </button>
+                <button onclick="openNewSettlementModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 shadow-sm">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>ثبت پرداخت و تسویه</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Craftsmen Wage Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="craftsmen-payroll-cards">
+            <!-- Dynamic Cards rendered via app.js -->
+        </div>
+
+        <!-- Settlement History Table -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-heading text-[var(--text-primary)] flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-4 h-4 text-amber-600"></i>
+                    <span>تاریخچه تسویه‌حساب‌ها و پرداخت دستمزد</span>
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="dilan-table">
+                    <thead>
+                        <tr>
+                            <th>شماره</th>
+                            <th>تاریخ</th>
+                            <th>نام استادکار</th>
+                            <th>عنوان دوره</th>
+                            <th>گرم کارکرد</th>
+                            <th>نرخ اجرت (ریال/گرم)</th>
+                            <th>مبلغ کل اجرت</th>
+                            <th>پرداخت ریالی</th>
+                            <th>پرداخت طلایی</th>
+                            <th>وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settlements-table-body">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 6: بوته ذوب، لحیم و قالکاری (CRUCIBLE, SOLDER & REFINING) -->
+    <!-- ========================================================================= -->
+    <section id="tab-crucible-refining" class="space-y-4 hidden">
+        <div class="dilan-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-r-4 border-blue-600">
+            <div>
+                <h2 class="text-base font-heading text-[var(--text-primary)] flex items-center gap-2">
+                    <i data-lucide="beaker" class="w-5 h-5 text-blue-600"></i>
+                    <span>مدیریت بوته‌های ذوب، فرمول‌ساز لحیم و پیگیری قالکاری</span>
+                </h2>
+                <p class="text-xs text-[var(--text-muted)] mt-1">
+                    ثبت شیره و بته ذوب، ماشین‌حساب ساخت لحیم استاندارد زرگری، و ردیابی خاکه ارسالی به قالکاری
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="loadCruciblesAndRefining()" class="px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-xs font-bold flex items-center gap-1 hover:border-amber-500">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>بروزرسانی داده‌ها</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3 Core Sub-Sections Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Sub 1: Solder Builder -->
+            <div class="dilan-card p-4 space-y-3 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2 mb-3">
+                        <h3 class="text-sm font-heading text-[var(--text-primary)] flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                            <span>فرمول‌ساز لحیم زرگری</span>
+                        </h3>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded font-bold">عیار استاندارد</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">نوع لحیم کاری:</label>
+                            <select id="solder-recipe-type" onchange="runSolderCalculation()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                                <option value="hard">لحیم سفت (جوش اولیه و قطعات سنگین - عیار ۷۴۰)</option>
+                                <option value="medium" selected>لحیم متوسط (کارهای عمومی و النگو - عیار ۷۳۰)</option>
+                                <option value="soft">لحیم شل (کارهای ظریف، گل و نگین - عیار ۷۱۵)</option>
+                                <option value="custom">لحیم سفارشی (درصد کادمیوم دلخواه)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">وزن طلای پایه ۷۵۰ (گرم):</label>
+                            <input id="solder-base-weight" type="number" step="0.1" value="10.0" oninput="runSolderCalculation()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono font-bold text-center dilan-input">
+                        </div>
+
+                        <div id="solder-custom-wrap" class="hidden">
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">درصد کادمیوم سفارشی (٪):</label>
+                            <input id="solder-custom-cadmium" type="number" step="0.1" value="2.5" oninput="runSolderCalculation()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                        </div>
+
+                        <!-- Live Recipe Result -->
+                        <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)] space-y-1.5 font-mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-[var(--text-muted)]">کادمیوم خالص:</span>
+                                <span id="solder-res-cadmium" class="font-bold text-amber-700 dark:text-amber-400">۰.۲۰۰ گرم</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[var(--text-muted)]">نقره خالص:</span>
+                                <span id="solder-res-silver" class="font-bold">۰.۰۷۴ گرم</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[var(--text-muted)]">وزن کل لحیم حاصل:</span>
+                                <span id="solder-res-total" class="font-bold text-emerald-700 dark:text-emerald-400">۱۰.۲۷۴ گرم</span>
+                            </div>
+                            <div class="flex justify-between border-t border-[var(--border-color)] pt-1 font-bold">
+                                <span class="text-[var(--text-muted)]">عیار نهایی لحیم:</span>
+                                <span id="solder-res-carat" class="text-blue-700 dark:text-blue-400">۷۳۰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" onclick="showSolderInstructionsModal()" class="w-full py-2 rounded-lg bg-[var(--bg-card-subtle)] border border-[var(--border-color)] hover:border-amber-500 text-xs font-bold transition-all">
+                        مشاهده دستورالعمل دقیق ریخته‌گری لحیم
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub 2: Crucible & Sheereh Log -->
+            <div class="dilan-card p-4 space-y-3 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2 mb-3">
+                        <h3 class="text-sm font-heading text-[var(--text-primary)] flex items-center gap-1.5">
+                            <i data-lucide="flame" class="w-4 h-4 text-rose-600"></i>
+                            <span>دفترچه تخصصی بوته و شیره ذوب</span>
+                        </h3>
+                        <span class="text-[10px] bg-rose-500/10 text-rose-700 dark:text-rose-300 px-2 py-0.5 rounded font-bold">کنترل رسوب</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">کد بوته:</label>
+                                <input id="crucible-code" type="text" value="بوته-۱۰۱" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold text-center dilan-input">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">مسئول ذوب:</label>
+                                <input id="crucible-operator" type="text" value="مسئول ذوب" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold text-center dilan-input">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">طلای اولیه (گرم):</label>
+                                <input id="crucible-raw-weight" type="number" step="0.001" placeholder="۱۰۰.۰۰۰" oninput="calcCrucibleNetLoss()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">بار افزوده (گرم):</label>
+                                <input id="crucible-alloy-added" type="number" step="0.001" value="0.000" oninput="calcCrucibleNetLoss()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">شمش خروجی (گرم):</label>
+                                <input id="crucible-melted-weight" type="number" step="0.001" placeholder="۹۹.۵۰۰" oninput="calcCrucibleNetLoss()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">شیره بوته (گرم):</label>
+                                <input id="crucible-sheereh-weight" type="number" step="0.001" value="0.300" oninput="calcCrucibleNetLoss()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                            </div>
+                        </div>
+
+                        <div class="bg-[var(--bg-card-subtle)] p-2.5 rounded-xl border border-[var(--border-color)] flex justify-between items-center">
+                            <span class="font-bold text-[var(--text-muted)]">کسری خالص ذوب:</span>
+                            <span id="crucible-net-loss-badge" class="font-mono text-sm font-black text-rose-700 dark:text-rose-400">۰.۲۰۰- گرم</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" onclick="submitCrucibleRecord()" class="w-full py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-lg text-xs font-bold shadow-sm transition-all">
+                        ثبت گزارش بوته در دفتر ذوب
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub 3: Refining Batches -->
+            <div class="dilan-card p-4 space-y-3 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2 mb-3">
+                        <h3 class="text-sm font-heading text-[var(--text-primary)] flex items-center gap-1.5">
+                            <i data-lucide="recycle" class="w-4 h-4 text-emerald-600"></i>
+                            <span>قالکاری، تیزاب‌کاری و خاکه‌شور</span>
+                        </h3>
+                        <span class="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-bold">بازیابی طلا</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">نام قالکار / کارگاه تیزاب:</label>
+                            <input id="refining-refiner-name" type="text" value="قالکاری و تیزاب حاج‌رضا" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">کد محموله:</label>
+                                <input id="refining-batch-code" type="text" value="REF-1405-01" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-[var(--text-muted)] mb-1">وزن ارسالی (گرم):</label>
+                                <input id="refining-sent-weight" type="number" step="0.1" value="150.0" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">نوع مواد ارسالی:</label>
+                            <select id="refining-material-type" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                                <option value="سوآله چرم و سوهانکاری">سوآله چرم و سوهانکاری کارگاه</option>
+                                <option value="شیره و بوته‌های مستعمل">شیره و بوته‌های مستعمل ذوب</option>
+                                <option value="لجن اسید و لایه‌برداری">لجن اسید و وان لایه‌برداری</option>
+                                <option value="خاک کف و غبار پولیش">خاک کف کارگاه و غبار فیلتر ساکشن</option>
+                            </select>
+                        </div>
+
+                        <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                            پس از تحویل به قالکار، محموله ثبت شده و پس از ری‌گیری و تیزاب، مقدار طلای ۷۵۰ بازیافتی در سیستم تراز می‌شود.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" onclick="submitRefiningBatch()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-sm transition-all">
+                        ثبت و ارسال محموله به قالکاری
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables for Crucibles and Refining -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Crucibles Table -->
+            <div class="dilan-card p-4 space-y-2">
+                <h4 class="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                    <i data-lucide="archive" class="w-4 h-4 text-amber-600"></i>
+                    <span>دفترچه سوابق بوته‌های ذوب و شیره</span>
+                </h4>
+                <div class="overflow-x-auto max-h-56">
+                    <table class="dilan-table text-xs">
+                        <thead>
+                            <tr>
+                                <th>تاریخ</th>
+                                <th>کد بوته</th>
+                                <th>طلای اولیه</th>
+                                <th>شمش</th>
+                                <th>شیره</th>
+                                <th>کسر خالص</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crucibles-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Refining Batches Table -->
+            <div class="dilan-card p-4 space-y-2">
+                <h4 class="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                    <span>سوابق قالکاری و طلای ۷۵۰ استحصالی</span>
+                </h4>
+                <div class="overflow-x-auto max-h-56">
+                    <table class="dilan-table text-xs">
+                        <thead>
+                            <tr>
+                                <th>کد</th>
+                                <th>قالکار</th>
+                                <th>وزن ارسالی</th>
+                                <th>طلای استحصالی ۷۵۰</th>
+                                <th>وضعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="refining-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL: Settlement Create (ثبت تسویه حساب دستمزد پرسنل) -->
+    <div id="modal-settlement" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-emerald-600"></i>
+                    <h3 class="font-heading text-lg text-[var(--text-primary)]">ثبت تسویه‌حساب دستمزد پرسنل</h3>
+                </div>
+                <button onclick="closeSettlementModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">انتخاب استادکار:</label>
+                    <select id="settle-craftsman-id" onchange="autoFillSettlementDetails()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">تاریخ تسویه:</label>
+                        <input id="settle-date" type="text" value="1405/07/29" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold text-center dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">عنوان دوره:</label>
+                        <input id="settle-period" type="text" value="تسویه هفتگی مهرماه" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">گرم کارکرد مبنا:</label>
+                        <input id="settle-worked-grams" type="number" step="0.001" value="0.000" oninput="calcSettlementTotal()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">نرخ اجرت (ریال/گرم):</label>
+                        <input id="settle-wage-rate" type="number" step="1000" value="450000" oninput="calcSettlementTotal()" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="bg-[var(--bg-card-subtle)] p-2.5 rounded-xl border border-[var(--border-color)] flex justify-between items-center font-bold">
+                    <span>مبلغ کل اجرت محاسبه‌شده:</span>
+                    <span id="settle-total-wage-badge" class="font-mono text-sm text-emerald-700 dark:text-emerald-400">۰ ریال</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">مبلغ پرداختی نقدی (ریال):</label>
+                        <input id="settle-paid-irr" type="number" step="10000" value="0" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">پرداخت به طلا (گرم ۷۵۰):</label>
+                        <input id="settle-paid-gold" type="number" step="0.001" value="0.000" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">وضعیت پرداخت:</label>
+                    <select id="settle-status" class="w-full p-1.5 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                        <option value="تسویه_شده">تسویه کامل (پرداخت شد)</option>
+                        <option value="علی_الحساب">پرداخت علی‌الحساب</option>
+                        <option value="مانده_دار">مانده‌دار (طلبکار)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">یادداشت:</label>
+                    <input id="settle-notes" type="text" placeholder="شماره پیگیری واریز یا یادداشت..." class="w-full p-1.5 rounded-lg border border-[var(--border-color)] dilan-input">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeSettlementModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">انصراف</button>
+                <button onclick="submitCraftsmanSettlement()" class="px-4 py-2 text-xs rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">ثبت نهایی تسویه</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Solder Casting Instructions (دستورالعمل متالورژی ساخت لحیم) -->
+    <div id="modal-solder-instructions" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-600"></i>
+                    <h3 class="font-heading text-lg text-[var(--text-primary)]">دستورالعمل تخصصی ریخته‌گری لحیم زرگری</h3>
+                </div>
+                <button onclick="closeSolderInstructionsModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs leading-relaxed text-[var(--text-primary)]" id="solder-instructions-content">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="closeSolderInstructionsModal()" class="px-4 py-2 text-xs rounded-xl bg-amber-600 text-white font-bold">متوجه شدم</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Complete Refining Batch (ثبت طلای استحصالی قالکاری) -->
+    <div id="modal-refining-complete" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+                    <h3 class="font-heading text-base text-[var(--text-primary)]">ثبت بازیافت و تسویه قالکاری</h3>
+                </div>
+                <button onclick="closeRefiningModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <input type="hidden" id="refining-complete-batch-id">
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">طلای ۷۵۰ استحصالی (گرم):</label>
+                    <input id="refining-complete-recovered" type="number" step="0.001" placeholder="مثلاً ۱۲.۴۵۰" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-sm text-emerald-700 dark:text-emerald-400 dilan-input">
+                </div>
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">اجرت قالکاری / تیزاب (ریال):</label>
+                    <input id="refining-complete-fee" type="number" step="10000" placeholder="مثلاً ۵۰۰۰۰۰۰" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                </div>
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">توضیحات و عیار اعلامی ری‌گیری:</label>
+                    <input id="refining-complete-notes" type="text" placeholder="مثلاً عیار ۷۵۱ - انگ ری‌گیری..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeRefiningModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">انصراف</button>
+                <button onclick="confirmCompleteRefiningBatch()" class="px-4 py-2 text-xs rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">ثبت بازیافت</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: Nightly Audit & Safe Reconciliation (تطبیق پایان روز و کنترل طلای مفقودی) -->
     <div id="modal-audit" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">

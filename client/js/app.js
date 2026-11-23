@@ -109,9 +109,14 @@ function switchMainTab(tabId) {
         if (sec) sec.classList.add("hidden");
     });
 
-    // Show active section
+    // Show active section with Antigravity spatial float-in animation
     const targetSection = document.getElementById(`tab-${tabId}`);
-    if (targetSection) targetSection.classList.remove("hidden");
+    if (targetSection) {
+        targetSection.classList.remove("hidden");
+        targetSection.classList.remove("tab-animate-in");
+        void targetSection.offsetWidth; // Trigger reflow
+        targetSection.classList.add("tab-animate-in");
+    }
 
     // Update tab button styles
     allTabs.forEach(t => {

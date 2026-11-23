@@ -469,6 +469,98 @@ def init_db() -> None:
         );
         """)
 
+        # 19. Assay Records (مدیریت آبشده‌های شرطی، ری‌گیری و تطبیق کسری/مازاد عیار)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS assay_records (
+            id SERIAL PRIMARY KEY,
+            date_shamsi TEXT NOT NULL,
+            bar_code TEXT NOT NULL,
+            lab_name TEXT NOT NULL,
+            receipt_no TEXT,
+            phone TEXT,
+            raw_scale_weight DOUBLE PRECISION NOT NULL,
+            provisional_carat INTEGER DEFAULT 750,
+            final_carat INTEGER,
+            equiv_750_initial DOUBLE PRECISION NOT NULL,
+            equiv_750_final DOUBLE PRECISION,
+            variance_750 DOUBLE PRECISION DEFAULT 0.0,
+            counterparty_id INTEGER REFERENCES accounts_counterparties(id) ON DELETE SET NULL,
+            status TEXT DEFAULT 'pending',
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 20. Bank & POS Accounts (تفکیک حساب‌های بانکی، دستگاه‌های پوز شاپرک و وام‌ها)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bank_and_pos_accounts (
+            id SERIAL PRIMARY KEY,
+            account_title TEXT NOT NULL,
+            account_type TEXT NOT NULL,
+            bank_name TEXT NOT NULL,
+            card_or_sheba TEXT,
+            pos_terminal_id TEXT,
+            balance_irr DOUBLE PRECISION DEFAULT 0.0,
+            diagnosis TEXT DEFAULT 'بدهکار به ما',
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 21. Gold / Cash Conversions (دفتر ثبت رسمی پولی‌کردن و طلایی‌کردن با مظنه روز)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS gold_cash_conversions (
+            id SERIAL PRIMARY KEY,
+            date_shamsi TEXT NOT NULL,
+            conversion_type TEXT NOT NULL,
+            counterparty_id INTEGER REFERENCES accounts_counterparties(id) ON DELETE SET NULL,
+            mazane_rate DOUBLE PRECISION NOT NULL,
+            gram_price_750 DOUBLE PRECISION NOT NULL,
+            gold_weight_750 DOUBLE PRECISION NOT NULL,
+            toman_amount DOUBLE PRECISION NOT NULL,
+            voucher_code TEXT,
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 22. Checks Portfolio (سبد چک‌های صیادی اشخاص و چک‌های شخصی صادره)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS checks_portfolio (
+            id SERIAL PRIMARY KEY,
+            check_direction TEXT NOT NULL,
+            sayad_id TEXT,
+            serial_no TEXT,
+            bank_name TEXT NOT NULL,
+            branch_name TEXT,
+            drawer_name TEXT NOT NULL,
+            payee_name TEXT,
+            counterparty_id INTEGER REFERENCES accounts_counterparties(id) ON DELETE SET NULL,
+            amount_irr DOUBLE PRECISION NOT NULL,
+            due_date_shamsi TEXT NOT NULL,
+            status TEXT DEFAULT 'نزد_صندوق',
+            deposit_bank_id INTEGER,
+            notes TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 23. Scissor Audit Logs (دفتر ثبت قیچی و انتقال فاکتور بین اشخاص)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS scissor_audit_logs (
+            id SERIAL PRIMARY KEY,
+            date_shamsi TEXT NOT NULL,
+            source_counterparty_id INTEGER NOT NULL,
+            target_counterparty_id INTEGER NOT NULL,
+            voucher_type TEXT NOT NULL,
+            voucher_id INTEGER NOT NULL,
+            gold_weight_750 DOUBLE PRECISION DEFAULT 0.0,
+            irr_amount DOUBLE PRECISION DEFAULT 0.0,
+            reason TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
         # Seeds for PostgreSQL
         default_craftsmen = [
             ("نیما", "استادکار پوست و پرداخت", "09120000001"),
@@ -498,6 +590,19 @@ def init_db() -> None:
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (title) DO NOTHING;
             """, (title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes))
+
+        # Seed Bank & POS Accounts for PostgreSQL
+        default_accounts = [
+            ("حساب جاری بانک ملت مغازه", "bank", "ملت", "IR120120000000123456789012", "", 150000000.0, "بدهکار به ما", "حساب اصلی تسویه شاپرک"),
+            ("کارتخوان به پرداخت ملت (POS)", "pos", "ملت", "", "POS-984421", 45000000.0, "بدهکار به ما", "حساب پوز مغازه جهت تطابق تراکنش‌های شاپرک فردا"),
+            ("وام طرح نگین بانک صادرات", "loan", "صادرات", "", "", 280000000.0, "بستانکار از ما", "اقساط مانده وام خرید تجهیزات"),
+        ]
+        for atitle, atype, bname, sheba, pos_id, bal, diag, notes in default_accounts:
+            cursor.execute("""
+            INSERT INTO bank_and_pos_accounts (account_title, account_type, bank_name, card_or_sheba, pos_terminal_id, balance_irr, diagnosis, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT DO NOTHING;
+            """, (atitle, atype, bname, sheba, pos_id, bal, diag, notes))
 
     else:
         # SQLite DDL
@@ -790,6 +895,101 @@ def init_db() -> None:
         );
         """)
 
+        # 19. Assay Records (مدیریت آبشده‌های شرطی، ری‌گیری و تطبیق کسری/مازاد عیار)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS assay_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_shamsi TEXT NOT NULL,
+            bar_code TEXT NOT NULL,
+            lab_name TEXT NOT NULL,
+            receipt_no TEXT,
+            phone TEXT,
+            raw_scale_weight REAL NOT NULL,
+            provisional_carat INTEGER DEFAULT 750,
+            final_carat INTEGER,
+            equiv_750_initial REAL NOT NULL,
+            equiv_750_final REAL,
+            variance_750 REAL DEFAULT 0.0,
+            counterparty_id INTEGER,
+            status TEXT DEFAULT 'pending',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(counterparty_id) REFERENCES accounts_counterparties(id) ON DELETE SET NULL
+        );
+        """)
+
+        # 20. Bank & POS Accounts (تفکیک حساب‌های بانکی، دستگاه‌های پوز شاپرک و وام‌ها)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bank_and_pos_accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_title TEXT NOT NULL,
+            account_type TEXT NOT NULL,
+            bank_name TEXT NOT NULL,
+            card_or_sheba TEXT,
+            pos_terminal_id TEXT,
+            balance_irr REAL DEFAULT 0.0,
+            diagnosis TEXT DEFAULT 'بدهکار به ما',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
+        # 21. Gold / Cash Conversions (دفتر ثبت رسمی پولی‌کردن و طلایی‌کردن با مظنه روز)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS gold_cash_conversions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_shamsi TEXT NOT NULL,
+            conversion_type TEXT NOT NULL,
+            counterparty_id INTEGER,
+            mazane_rate REAL NOT NULL,
+            gram_price_750 REAL NOT NULL,
+            gold_weight_750 REAL NOT NULL,
+            toman_amount REAL NOT NULL,
+            voucher_code TEXT,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(counterparty_id) REFERENCES accounts_counterparties(id) ON DELETE SET NULL
+        );
+        """)
+
+        # 22. Checks Portfolio (سبد چک‌های صیادی اشخاص و چک‌های شخصی صادره)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS checks_portfolio (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            check_direction TEXT NOT NULL,
+            sayad_id TEXT,
+            serial_no TEXT,
+            bank_name TEXT NOT NULL,
+            branch_name TEXT,
+            drawer_name TEXT NOT NULL,
+            payee_name TEXT,
+            counterparty_id INTEGER,
+            amount_irr REAL NOT NULL,
+            due_date_shamsi TEXT NOT NULL,
+            status TEXT DEFAULT 'نزد_صندوق',
+            deposit_bank_id INTEGER,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(counterparty_id) REFERENCES accounts_counterparties(id) ON DELETE SET NULL
+        );
+        """)
+
+        # 23. Scissor Audit Logs (دفتر ثبت قیچی و انتقال فاکتور بین اشخاص)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS scissor_audit_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date_shamsi TEXT NOT NULL,
+            source_counterparty_id INTEGER NOT NULL,
+            target_counterparty_id INTEGER NOT NULL,
+            voucher_type TEXT NOT NULL,
+            voucher_id INTEGER NOT NULL,
+            gold_weight_750 REAL DEFAULT 0.0,
+            irr_amount REAL DEFAULT 0.0,
+            reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+
         # Seeds for SQLite
         default_craftsmen = [
             ("نیما", "استادکار پوست و پرداخت", "09120000001"),
@@ -823,6 +1023,18 @@ def init_db() -> None:
             INSERT OR IGNORE INTO solder_recipes (title, solder_type, base_gold_weight, base_carat, cadmium_percent, cadmium_weight, silver_weight, copper_weight, total_solder_weight, final_carat, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """, (title, stype, bgw, bgc, cdp, cdw, agw, cuw, tsw, fgc, notes))
+
+        # Seed Bank & POS Accounts for SQLite
+        default_accounts = [
+            ("حساب جاری بانک ملت مغازه", "bank", "ملت", "IR120120000000123456789012", "", 150000000.0, "بدهکار به ما", "حساب اصلی تسویه شاپرک"),
+            ("کارتخوان به پرداخت ملت (POS)", "pos", "ملت", "", "POS-984421", 45000000.0, "بدهکار به ما", "حساب پوز مغازه جهت تطابق تراکنش‌های شاپرک فردا"),
+            ("وام طرح نگین بانک صادرات", "loan", "صادرات", "", "", 280000000.0, "بستانکار از ما", "اقساط مانده وام خرید تجهیزات"),
+        ]
+        for atitle, atype, bname, sheba, pos_id, bal, diag, notes in default_accounts:
+            cursor.execute("""
+            INSERT OR IGNORE INTO bank_and_pos_accounts (account_title, account_type, bank_name, card_or_sheba, pos_terminal_id, balance_irr, diagnosis, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            """, (atitle, atype, bname, sheba, pos_id, bal, diag, notes))
 
     conn.commit()
     conn.close()

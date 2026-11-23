@@ -104,9 +104,10 @@ def add_party_transaction(tx: CounterpartyTransactionCreate):
         WHERE id = ?
     """, (net_gold, net_irr, tx.counterparty_id))
 
+    new_id = cursor.lastrowid
     conn.commit()
     conn.close()
-    return {"status": "success", "net_gold_750": net_gold, "net_irr": net_irr}
+    return {"id": new_id, "status": "success", "net_gold_750": net_gold, "net_irr": net_irr}
 
 
 @router.get("/expenses")

@@ -87,6 +87,18 @@
             <i data-lucide="beaker" class="w-4 h-4"></i>
             <span>۶. بوته، لحیم و قالکاری</span>
         </button>
+        <button onclick="switchMainTab('assay-manager')" id="tab-btn-assay-manager" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="test-tube" class="w-4 h-4 text-sky-500"></i>
+            <span>۷. ری‌گیری و آبشده شرطی</span>
+        </button>
+        <button onclick="switchMainTab('market-clearing')" id="tab-btn-market-clearing" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-500"></i>
+            <span>۸. تسویه بازار (پولی/طلایی و رأس‌گیری)</span>
+        </button>
+        <button onclick="switchMainTab('pos-banking')" id="tab-btn-pos-banking" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+            <i data-lucide="credit-card" class="w-4 h-4 text-purple-500"></i>
+            <span>۹. بانک، پوز شاپرک و چک‌ها</span>
+        </button>
     </nav>
 
     <!-- ========================================================================= -->
@@ -1146,6 +1158,431 @@
         </div>
     </section>
 
+    <!-- ========================================================================= -->
+    <!-- TAB 7: ری‌گیری و آبشده شرطی (مدیریت تخصصی آزمایشگاه‌ها و تطبیق کسری عیار) -->
+    <!-- ========================================================================= -->
+    <section id="tab-assay-manager" class="space-y-4 hidden">
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="dilan-card p-4 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">آبشده‌های در انتظار جواب:</span>
+                    <h3 id="stat-assay-pending-count" class="text-xl font-heading text-amber-600 mt-1">۰ عدد</h3>
+                    <p class="text-[10px] text-[var(--text-muted)] mt-0.5">آبشده شرطی تحویلی به آزمایشگاه</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="dilan-card p-4 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">وزن کل در ری‌گیری:</span>
+                    <h3 id="stat-assay-pending-weight" class="text-xl font-heading text-sky-600 mt-1">۰.۰۰۰ گرم</h3>
+                    <p class="text-[10px] text-[var(--text-muted)] mt-0.5">وزن معلق در انتظار تایید قطعی</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-600">
+                    <i data-lucide="scale" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="dilan-card p-4 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-[var(--text-muted)] font-bold">تعدیل و کسری/مازاد عیار کل:</span>
+                    <h3 id="stat-assay-net-variance" class="text-xl font-heading text-emerald-600 mt-1">۰.۰۰۰ گرم</h3>
+                    <p class="text-[10px] text-[var(--text-muted)] mt-0.5">اختلاف اعمال‌شده در ته‌حساب طرف‌حساب‌ها</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form & Table Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Form Card -->
+            <div class="dilan-card p-4 space-y-3">
+                <div class="flex items-center gap-2 border-b border-[var(--border-color)] pb-2">
+                    <i data-lucide="flask-conical" class="w-5 h-5 text-sky-600"></i>
+                    <h3 class="font-heading text-sm text-[var(--text-primary)]">ثبت شمش آبشده شرطی جدید</h3>
+                </div>
+
+                <div class="space-y-2.5 text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">تاریخ ارسال:</label>
+                            <input id="assay-input-date" type="text" value="1405/07/29" class="w-full p-2 rounded-lg border border-[var(--border-color)] text-center font-bold dilan-input">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">انگ / کد شمش:</label>
+                            <input id="assay-input-barcode" type="text" placeholder="مثلاً ش-۴۰۹۵" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">آزمایشگاه ری‌گیری:</label>
+                            <input id="assay-input-lab" type="text" list="default-labs-list" placeholder="کاسپین، عیار، تهران..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <datalist id="default-labs-list">
+                                <option value="ری‌گیری کاسپین (بازار بزرگ)">
+                                <option value="ری‌گیری عیار (سبزه‌میدان)">
+                                <option value="ری‌گیری تهران (۱۵ خرداد)">
+                                <option value="ری‌گیری صمد (تکیه دولت)">
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">شماره قبض ری‌گیری:</label>
+                            <input id="assay-input-receipt" type="text" placeholder="مثلاً ۹۰۱۴۴" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">وزن دقیق ترازو (گرم):</label>
+                            <input id="assay-input-weight" type="number" step="0.001" placeholder="مثلاً ۸۵.۳۲۰" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-sky-700 dark:text-sky-400 dilan-input">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">عیار فرضی اولیه:</label>
+                            <input id="assay-input-provisional" type="number" value="750" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب (تامین‌کننده/بنکدار):</label>
+                        <select id="assay-input-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">تلفن ری‌گیری / یادداشت:</label>
+                        <input id="assay-input-notes" type="text" placeholder="تلفن ری‌گیری یا توضیحات نمونه‌برداری..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                    </div>
+
+                    <button onclick="submitNewAssayRecord()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>ثبت شمش شرطی در کارتابل ری‌گیری</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="dilan-card p-4 space-y-3 lg:col-span-2">
+                <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="list-checks" class="w-5 h-5 text-sky-600"></i>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">کارتابل آبشده‌های ارسالی و نتایج قطعی ری‌گیری</h3>
+                    </div>
+                    <button onclick="loadAssays()" class="text-xs text-[var(--text-muted)] hover:text-sky-600 flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>بروزرسانی</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="dilan-table text-xs">
+                        <thead>
+                            <tr>
+                                <th>انگ شمش</th>
+                                <th>تاریخ</th>
+                                <th>ری‌گیری و قبض</th>
+                                <th>وزن ترازو</th>
+                                <th>عیار اولیه</th>
+                                <th>عیار قطعی</th>
+                                <th>تعدیل عیار (سوت)</th>
+                                <th>طرف‌حساب</th>
+                                <th>وضعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assay-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 8: تسویه بازار (پولی‌کردن، طلایی‌کردن، رأس‌گیری و قیچی اسناد) -->
+    <!-- ========================================================================= -->
+    <section id="tab-market-clearing" class="space-y-4 hidden">
+        <!-- Dual Live Converters -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Cashify Card (پولی کردن طلا) -->
+            <div class="dilan-card p-5 space-y-3 border-r-4 border-amber-500">
+                <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="coins" class="w-5 h-5 text-amber-500"></i>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">۱. پولی‌کردن طلا (Cashify)</h3>
+                    </div>
+                    <span class="text-[10px] bg-amber-500/10 text-amber-600 font-bold px-2 py-0.5 rounded-full">طلا ← تومان</span>
+                </div>
+                <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                    تسویه بدهی یا طلب طلایی همکار با پول نقد بر مبنای مظنه لحظه‌ای بازار تهران ($\text{مظنه} \div 4.331802$).
+                </p>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">وزن طلای ۷۵۰ (گرم):</label>
+                        <input id="cashify-weight" type="number" step="0.001" value="10.000" oninput="updateLiveCashifyCalc()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-amber-700 dark:text-amber-400 dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">مظنه طلای ۱۷ عیار (تومان):</label>
+                        <input id="cashify-mazane" type="number" step="10000" value="18500000" oninput="updateLiveCashifyCalc()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)] space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center text-[var(--text-muted)]">
+                        <span>نرخ هر گرم طلای ۷۵۰:</span>
+                        <span id="cashify-gram-price" class="font-mono font-bold text-[var(--text-primary)]">۴،۲۷۰،۷۴۰ تومان</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-[var(--border-color)] pt-1.5">
+                        <span class="font-bold text-amber-600">مبلغ قطعی تسویه:</span>
+                        <span id="cashify-total-toman" class="font-mono font-black text-base text-amber-600">۴۲،۷۰۷،۴۰۰ تومان</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب:</label>
+                        <select id="cashify-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="submitCashify()" class="w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>ثبت پولی‌کردن در دفتر بازار</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goldify Card (طلایی کردن پول/اجرت) -->
+            <div class="dilan-card p-5 space-y-3 border-r-4 border-emerald-500">
+                <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="sparkle" class="w-5 h-5 text-emerald-500"></i>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">۲. طلایی‌کردن وجه/اجرت (Goldify)</h3>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/10 text-emerald-600 font-bold px-2 py-0.5 rounded-full">تومان ← طلا</span>
+                </div>
+                <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                    تبدیل بدهی ریالی، فاکتورهای اجرت ساخت یا وام به گرم طلای ۷۵۰ جهت بیمه‌کردن سرمایه در برابر تورم.
+                </p>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">مبلغ وجه/اجرت (تومان):</label>
+                        <input id="goldify-toman" type="number" step="10000" value="50000000" oninput="updateLiveGoldifyCalc()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-emerald-700 dark:text-emerald-400 dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">مظنه توافقی (تومان):</label>
+                        <input id="goldify-mazane" type="number" step="10000" value="18500000" oninput="updateLiveGoldifyCalc()" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)] space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center text-[var(--text-muted)]">
+                        <span>مبنای تبدیل:</span>
+                        <span class="font-mono text-xs">۱ گرم ۷۵۰ = مظنه ÷ ۴.۳۳۱۸۰۲</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-[var(--border-color)] pt-1.5">
+                        <span class="font-bold text-emerald-600">وزن طلای معادل ۷۵۰:</span>
+                        <span id="goldify-result-gold" class="font-mono font-black text-base text-emerald-600">۱۱.۷۰۸ گرم</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب:</label>
+                        <select id="goldify-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="submitGoldify()" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-1.5">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>ثبت طلایی‌کردن در دفتر بازار</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ras-Giri & Scissor Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            
+            <!-- Ras-Giri Calculator (رأس‌گیری وزنی و تاریخی طلا و چک) -->
+            <div class="dilan-card p-5 space-y-3">
+                <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-500"></i>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">ماشین‌حساب رأس‌گیری هوشمند طلا و فاکتورها</h3>
+                    </div>
+                    <button onclick="addRasGiriRow()" class="text-xs bg-indigo-500/10 text-indigo-600 font-bold px-2 py-1 rounded-lg hover:bg-indigo-500/20 flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>افزودن ردیف</span>
+                    </button>
+                </div>
+
+                <p class="text-[11px] text-[var(--text-muted)]">
+                    محاسبه میانگین وزنی روزهای تسویه چند فاکتور یا چک طبق استاندارد بازار طلا ($\sum(مقدار \times روز) \div \sum مقدار$).
+                </p>
+
+                <div class="overflow-x-auto max-h-48">
+                    <table class="dilan-table text-xs">
+                        <thead>
+                            <tr>
+                                <th>عنوان فاکتور / چک</th>
+                                <th>مقدار (وزن طلا یا ریال)</th>
+                                <th>سررسید (روز)</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rasgiri-table-body">
+                            <tr>
+                                <td><input type="text" value="فاکتور النگو" class="p-1 rounded border border-[var(--border-color)] text-xs w-full dilan-input"></td>
+                                <td><input type="number" step="0.001" value="100.000" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-amt"></td>
+                                <td><input type="number" value="10" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-day"></td>
+                                <td class="text-center"><button onclick="this.closest('tr').remove(); calculateLiveRasGiri();" class="text-rose-500 font-bold">✕</button></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" value="فاکتور سرویس" class="p-1 rounded border border-[var(--border-color)] text-xs w-full dilan-input"></td>
+                                <td><input type="number" step="0.001" value="200.000" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-amt"></td>
+                                <td><input type="number" value="25" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-day"></td>
+                                <td class="text-center"><button onclick="this.closest('tr').remove(); calculateLiveRasGiri();" class="text-rose-500 font-bold">✕</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400">رأس میانگین تسویه:</span>
+                        <p class="text-[10px] text-[var(--text-muted)] mt-0.5">فاصله زمانی تا تاریخ تعادل پرداخت‌ها</p>
+                    </div>
+                    <span id="rasgiri-result-badge" class="font-mono font-black text-base text-indigo-600 bg-white dark:bg-slate-900 px-3 py-1 rounded-lg border border-indigo-500/30">
+                        ۲۵.۰ روز
+                    </span>
+                </div>
+            </div>
+
+            <!-- Scissor Tool Card (ابزار قیچی سند) -->
+            <div class="dilan-card p-5 space-y-3">
+                <div class="flex items-center gap-2 border-b border-[var(--border-color)] pb-2">
+                    <i data-lucide="scissors" class="w-5 h-5 text-rose-500"></i>
+                    <h3 class="font-heading text-sm text-[var(--text-primary)]">ابزار قیچی سند (انتقال فاکتور اشتباهی)</h3>
+                </div>
+
+                <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
+                    گاهی فاکتوری به اشتباه در حساب یک همکار ثبت شده است. ابزار قیچی این سند را کاملاً از حساب شخص اول بریده و بدون بهم‌ریختن مانده‌ها به حساب شخص دوم منتقل می‌کند.
+                </p>
+
+                <div class="space-y-2.5 text-xs">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">شماره شناسه تراکنش (ID سند):</label>
+                        <input id="scissor-tx-id" type="number" placeholder="مثلاً ۵۴" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب مبدا (اشتباهی):</label>
+                            <select id="scissor-source-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب مقصد (صحیح):</label>
+                            <select id="scissor-target-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">علت قیچی و انتقال سند:</label>
+                        <input id="scissor-reason" type="text" placeholder="مثلاً ثبت اشتباهی توسط کمک‌حسابدار..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                    </div>
+
+                    <button onclick="submitScissorTransfer()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                        <i data-lucide="scissors" class="w-4 h-4"></i>
+                        <span>قیچی و انتقال به حساب مقصد</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 9: بانک‌ها، کارتخوان پوز شاپرک و چک‌های صیادی -->
+    <!-- ========================================================================= -->
+    <section id="tab-pos-banking" class="space-y-4 hidden">
+        <!-- Accounts Header & List -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="landmark" class="w-5 h-5 text-purple-600"></i>
+                    <div>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">حساب‌های بانکی، پوز شاپرک و وام‌های مغازه</h3>
+                        <p class="text-[10px] text-[var(--text-muted)]">تفکیک کارتخوان پوز از حساب شتاب جهت تطابق تراکنش‌های فردای شاپرک (T+1)</p>
+                    </div>
+                </div>
+                <button onclick="openAddAccountModal()" class="text-xs bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>+ افتتاح / معرفی حساب جدید</span>
+                </button>
+            </div>
+
+            <!-- Accounts Grid -->
+            <div id="bank-accounts-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Checks Portfolio Table -->
+        <div class="dilan-card p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-5 h-5 text-purple-600"></i>
+                    <div>
+                        <h3 class="font-heading text-sm text-[var(--text-primary)]">سبد چک‌های صیادی اشخاص و چک‌های صادره مغازه</h3>
+                        <p class="text-[10px] text-[var(--text-muted)]">کنترل سررسید، شناسه صیادی ۱۶ رقمی و وضعیت وصول</p>
+                    </div>
+                </div>
+                <button onclick="openAddCheckModal()" class="text-xs bg-[var(--bg-card-subtle)] border border-[var(--border-color)] hover:border-purple-500 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-purple-600"></i>
+                    <span>ثبت چک جدید</span>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="dilan-table text-xs">
+                    <thead>
+                        <tr>
+                            <th>جهت چک</th>
+                            <th>شناسه صیادی ۱۶ رقمی</th>
+                            <th>بانک</th>
+                            <th>صاحب حساب / صادرکننده</th>
+                            <th>در وجه</th>
+                            <th>مبلغ چک (تومان)</th>
+                            <th>تاریخ سررسید</th>
+                            <th>وضعیت</th>
+                            <th>عملیات و تغییر وضعیت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checks-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
     <!-- MODAL: Settlement Create (ثبت تسویه حساب دستمزد پرسنل) -->
     <div id="modal-settlement" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="dilan-card rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
@@ -1331,8 +1768,216 @@
         </div>
     </div>
 
+    <!-- MODAL: Reconcile Assay Result (ثبت نتیجه آزمایشگاه ری‌گیری) -->
+    <div id="modal-assay-reconcile" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-sky-600"></i>
+                    <h3 class="font-heading text-base text-[var(--text-primary)]">اعلام نتیجه قطعی آزمایشگاه ری‌گیری</h3>
+                </div>
+                <button onclick="closeAssayReconcileModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <input type="hidden" id="reconcile-assay-id">
+            <input type="hidden" id="reconcile-raw-weight">
+            <input type="hidden" id="reconcile-initial-equiv">
+
+            <div class="bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)] space-y-1 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-[var(--text-muted)]">انگ شمش:</span>
+                    <span id="reconcile-display-barcode" class="font-bold text-[var(--text-primary)]">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[var(--text-muted)]">وزن ترازو:</span>
+                    <span id="reconcile-display-weight" class="font-mono font-bold text-[var(--text-primary)]">-- گرم</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[var(--text-muted)]">آزمایشگاه:</span>
+                    <span id="reconcile-display-lab" class="font-bold text-[var(--text-primary)]">--</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">عیار قطعی اعلامی آزمایشگاه:</label>
+                    <input id="reconcile-final-carat" type="number" placeholder="مثلاً ۷۴۶ یا ۷۵۵" oninput="calculateLiveAssayVariance()" class="w-full p-2.5 rounded-lg border border-[var(--border-color)] font-mono text-center font-black text-lg text-sky-600 dilan-input">
+                </div>
+
+                <div id="reconcile-variance-box" class="p-3 rounded-xl border border-sky-500/20 bg-sky-500/10 space-y-1">
+                    <div class="flex justify-between font-bold">
+                        <span>وزن قطعی ۷۵۰:</span>
+                        <span id="reconcile-calc-final-gold" class="font-mono text-sm">-- گرم</span>
+                    </div>
+                    <div class="flex justify-between font-bold">
+                        <span>مازاد / کسری عیار:</span>
+                        <span id="reconcile-calc-variance" class="font-mono text-sm">-- گرم</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">توضیحات تکمیلی:</label>
+                    <input id="reconcile-notes" type="text" placeholder="شماره پاسخ تلفنی یا ثبت در دفتر ری‌گیری..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeAssayReconcileModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">انصراف</button>
+                <button onclick="confirmAssayReconcile()" class="px-4 py-2 text-xs rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold">ثبت قطعی و تعدیل حساب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Bank / POS / Loan Account (افتتاح حساب جدید) -->
+    <div id="modal-add-bank-account" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-purple-600"></i>
+                    <h3 class="font-heading text-base text-[var(--text-primary)]">افتتاح یا معرفی حساب جدید</h3>
+                </div>
+                <button onclick="closeAddAccountModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">عنوان حساب:</label>
+                    <input id="newacc-title" type="text" placeholder="مثلاً جاری بانک پاسارگاد شعبه بازار..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">نوع حساب:</label>
+                        <select id="newacc-type" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <option value="bank">حساب بانکی (جاری/کوتاه‌مدت)</option>
+                            <option value="pos">دستگاه پوز کارتخوان (T+1)</option>
+                            <option value="loan">حساب وام بانکی</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">نام بانک:</label>
+                        <input id="newacc-bank" type="text" placeholder="ملت، پاسارگاد، صادرات..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">شماره شبا یا کارت:</label>
+                        <input id="newacc-sheba" type="text" placeholder="IR..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">کد ترمینال پوز (در صورت پوز):</label>
+                        <input id="newacc-terminal" type="text" placeholder="POS-..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">موجودی فعلی (ریال):</label>
+                        <input id="newacc-balance" type="number" step="10000" value="0" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">تشخیص:</label>
+                        <select id="newacc-diagnosis" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <option value="بدهکار به ما">بدهکار به ما (موجودی ما)</option>
+                            <option value="بستانکار از ما">بستانکار از ما (بدهی وام)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">یادداشت:</label>
+                    <input id="newacc-notes" type="text" placeholder="توضیحات حساب..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeAddAccountModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">انصراف</button>
+                <button onclick="submitNewBankAccount()" class="px-4 py-2 text-xs rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold">افتتاح حساب</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Check (ثبت چک صیادی جدید) -->
+    <div id="modal-add-check" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="dilan-card rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-5 h-5 text-purple-600"></i>
+                    <h3 class="font-heading text-base text-[var(--text-primary)]">ثبت چک صیادی جدید در سبد چک‌ها</h3>
+                </div>
+                <button onclick="closeAddCheckModal()" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-sm font-bold">✕</button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">جهت چک:</label>
+                        <select id="newchk-direction" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <option value="received">چک دریافتی از مشتری / همکار</option>
+                            <option value="issued">چک شخصی صادره مغازه</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">شناسه ۱۶ رقمی صیادی:</label>
+                        <input id="newchk-sayad" type="text" placeholder="۱۶ رقم بدون خط تیره..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold tracking-wider dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">بانک:</label>
+                        <input id="newchk-bank" type="text" placeholder="ملت، ملی، سپه..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">سریال چک:</label>
+                        <input id="newchk-serial" type="text" placeholder="A-123456" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">تاریخ سررسید:</label>
+                        <input id="newchk-due-date" type="text" value="1405/08/15" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">صاحب حساب / صادرکننده:</label>
+                        <input id="newchk-drawer" type="text" placeholder="نام صاحب چک..." class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">در وجه:</label>
+                        <input id="newchk-payee" type="text" value="گالری طلای دیلان" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">مبلغ چک (تومان):</label>
+                        <input id="newchk-amount" type="number" step="10000" placeholder="مثلاً ۵۰۰۰۰۰۰۰" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-mono text-center font-bold text-sm dilan-input">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[var(--text-muted)] mb-1">طرف‌حساب مرتبط:</label>
+                        <select id="newchk-party" class="w-full p-2 rounded-lg border border-[var(--border-color)] font-bold dilan-input">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[var(--text-muted)] mb-1">یادداشت:</label>
+                    <input id="newchk-notes" type="text" placeholder="بابت فاکتور یا توضیحات..." class="w-full p-2 rounded-lg border border-[var(--border-color)] dilan-input">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeAddCheckModal()" class="px-4 py-2 text-xs rounded-xl border border-[var(--border-color)] font-bold">انصراف</button>
+                <button onclick="submitNewCheck()" class="px-4 py-2 text-xs rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold">ثبت چک</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Logic -->
-    <script src="/static/js/app.js?v=5"></script>
+    <script src="/static/js/app.js?v=6"></script>
     <script>
         lucide.createIcons();
     </script>

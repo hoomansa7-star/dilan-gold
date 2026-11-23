@@ -25,6 +25,7 @@ from server.routes.calculator import router as calc_router
 from server.routes.showcase import router as showcase_router
 from server.routes.sales import router as sales_router
 from server.routes.accounts import router as accounts_router
+from server.routes.market_ops import router as market_router
 from server.routes.system import router as system_router
 
 app = FastAPI(
@@ -48,6 +49,7 @@ app.include_router(calc_router)
 app.include_router(showcase_router)
 app.include_router(sales_router)
 app.include_router(accounts_router)
+app.include_router(market_router)
 app.include_router(system_router)
 
 # Paths

@@ -97,7 +97,10 @@ function switchMainTab(tabId) {
         "bench-quickpad",
         "melting-calc",
         "craftsmen-payroll",
-        "crucible-refining"
+        "crucible-refining",
+        "assay-manager",
+        "market-clearing",
+        "pos-banking"
     ];
 
     // Hide all tab sections
@@ -129,6 +132,18 @@ function switchMainTab(tabId) {
     } else if (tabId === "crucible-refining") {
         loadCruciblesAndRefining();
         runSolderCalculation();
+    } else if (tabId === "assay-manager") {
+        loadAssays();
+        populateCounterpartyDropdowns();
+    } else if (tabId === "market-clearing") {
+        updateLiveCashifyCalc();
+        updateLiveGoldifyCalc();
+        calculateLiveRasGiri();
+        populateCounterpartyDropdowns();
+    } else if (tabId === "pos-banking") {
+        loadBankAndPosAccounts();
+        loadChecksPortfolio();
+        populateCounterpartyDropdowns();
     }
 }
 
@@ -1240,3 +1255,632 @@ async function confirmCompleteRefiningBatch() {
     }
 }
 
+
+
+// =========================================================================
+// PHASE 3: MARKET CLEARING, ASSAY RECONCILIATION, POS & CHECKS
+// =========================================================================
+
+const MAZANE_DIVISOR = 4.331802;
+
+// -------------------------------------------------------------
+// Counterparties Dropdown Helper
+// -------------------------------------------------------------
+async function populateCounterpartyDropdowns() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/accounts/counterparties`);
+        if (!resp.ok) return;
+        const parties = await resp.json();
+
+        const targets = [
+            "assay-input-party",
+            "cashify-party",
+            "goldify-party",
+            "scissor-source-party",
+            "scissor-target-party",
+            "newchk-party"
+        ];
+
+        targets.forEach(tid => {
+            const el = document.getElementById(tid);
+            if (!el) return;
+            el.innerHTML = "";
+            
+            if (tid.includes("scissor") || tid.includes("party")) {
+                const optDefault = document.createElement("option");
+                optDefault.value = "";
+                optDefault.textContent = "-- انتخاب طرف‌حساب --";
+                el.appendChild(optDefault);
+            }
+
+            parties.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = `${p.name} (${p.role || 'طرف‌حساب'}) - مانده طلا: ${formatGold(p.balance_gold_750)}g`;
+                el.appendChild(opt);
+            });
+        });
+    } catch (err) {
+        console.error("Error populating counterparties:", err);
+    }
+}
+
+// -------------------------------------------------------------
+// 1. Assay Management (آبشده شرطی و آزمایشگاه ری‌گیری)
+// -------------------------------------------------------------
+async function loadAssays() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/assays`);
+        if (!resp.ok) return;
+        const assays = await resp.json();
+
+        const tbody = document.getElementById("assay-table-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        let pendingCount = 0;
+        let pendingWeight = 0.0;
+        let netVariance = 0.0;
+
+        assays.forEach(a => {
+            if (a.status === "pending") {
+                pendingCount++;
+                pendingWeight += (a.raw_scale_weight || 0.0);
+            }
+            netVariance += (a.variance_750 || 0.0);
+
+            const isPending = a.status === "pending";
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="font-mono font-bold text-sky-700 dark:text-sky-400">${a.bar_code || '---'}</td>
+                <td class="font-mono">${a.date_shamsi || '---'}</td>
+                <td>
+                    <div class="font-bold">${a.lab_name}</div>
+                    <div class="text-[10px] text-[var(--text-muted)] font-mono">قبض: ${a.receipt_no || 'ندارد'}</div>
+                </td>
+                <td class="font-mono font-bold text-center">${formatGold(a.raw_scale_weight)}</td>
+                <td class="font-mono text-center">${a.provisional_carat}</td>
+                <td class="font-mono text-center font-bold ${isPending ? 'text-amber-500' : 'text-emerald-600'}">
+                    ${isPending ? 'در انتظار' : a.final_carat}
+                </td>
+                <td class="font-mono text-center font-bold ${a.variance_750 < 0 ? 'text-rose-600' : (a.variance_750 > 0 ? 'text-emerald-600' : '')}">
+                    ${isPending ? '---' : (a.variance_750 > 0 ? '+' : '') + formatGold(a.variance_750)}
+                </td>
+                <td>${a.counterparty_name || 'تامین‌کننده ناشناس'}</td>
+                <td>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPending ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'}">
+                        ${isPending ? 'معلق در ری‌گیری' : 'تعیین عیار شده'}
+                    </span>
+                </td>
+                <td class="text-center">
+                    ${isPending ? `
+                        <button onclick="openAssayReconcileModal(${a.id}, '${a.bar_code}', ${a.raw_scale_weight}, '${a.lab_name}', ${a.provisional_carat})" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-600 hover:bg-sky-700 text-white transition-all">
+                            اعلام عیار
+                        </button>
+                    ` : `
+                        <span class="text-emerald-600 text-xs font-bold">✓ تراز</span>
+                    `}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Update stats
+        const statCount = document.getElementById("stat-assay-pending-count");
+        if (statCount) statCount.textContent = `${pendingCount} عدد`;
+
+        const statWeight = document.getElementById("stat-assay-pending-weight");
+        if (statWeight) statWeight.textContent = `${formatGold(pendingWeight)} گرم`;
+
+        const statVar = document.getElementById("stat-assay-net-variance");
+        if (statVar) {
+            statVar.textContent = `${netVariance > 0 ? '+' : ''}${formatGold(netVariance)} گرم`;
+            statVar.className = `text-xl font-heading mt-1 ${netVariance < 0 ? 'text-rose-600' : 'text-emerald-600'}`;
+        }
+    } catch (err) {
+        console.error("Error loading assays:", err);
+    }
+}
+
+async function submitNewAssayRecord() {
+    const barcode = document.getElementById("assay-input-barcode")?.value.trim();
+    const lab = document.getElementById("assay-input-lab")?.value.trim();
+    const weight = parseFloat(document.getElementById("assay-input-weight")?.value);
+    const date = document.getElementById("assay-input-date")?.value.trim();
+    const receipt = document.getElementById("assay-input-receipt")?.value.trim() || "";
+    const prov = parseInt(document.getElementById("assay-input-provisional")?.value) || 750;
+    const party = parseInt(document.getElementById("assay-input-party")?.value) || null;
+    const notes = document.getElementById("assay-input-notes")?.value.trim() || "";
+
+    if (!barcode || !lab || !weight || weight <= 0) {
+        showToast("لطفاً انگ شمش، نام آزمایشگاه ری‌گیری و وزن ترازو را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/assays`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                date_shamsi: date,
+                bar_code: barcode,
+                lab_name: lab,
+                receipt_no: receipt,
+                phone: "",
+                raw_scale_weight: weight,
+                provisional_carat: prov,
+                counterparty_id: party,
+                notes: notes
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ثبت شمش شرطی");
+        showToast(`شمش شرطی انگ ${barcode} با موفقیت ثبت شد.`, "success");
+        document.getElementById("assay-input-barcode").value = "";
+        document.getElementById("assay-input-weight").value = "";
+        loadAssays();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+function openAssayReconcileModal(id, barcode, weight, lab, provCarat) {
+    document.getElementById("reconcile-assay-id").value = id;
+    document.getElementById("reconcile-raw-weight").value = weight;
+    document.getElementById("reconcile-initial-equiv").value = (weight * provCarat) / 750;
+
+    document.getElementById("reconcile-display-barcode").textContent = barcode;
+    document.getElementById("reconcile-display-weight").textContent = `${formatGold(weight)} گرم`;
+    document.getElementById("reconcile-display-lab").textContent = lab;
+
+    document.getElementById("reconcile-final-carat").value = "";
+    document.getElementById("reconcile-notes").value = "";
+    document.getElementById("reconcile-calc-final-gold").textContent = "-- گرم";
+    document.getElementById("reconcile-calc-variance").textContent = "-- گرم";
+
+    const modal = document.getElementById("modal-assay-reconcile");
+    if (modal) modal.classList.remove("hidden");
+}
+
+function closeAssayReconcileModal() {
+    const modal = document.getElementById("modal-assay-reconcile");
+    if (modal) modal.classList.add("hidden");
+}
+
+function calculateLiveAssayVariance() {
+    const weight = parseFloat(document.getElementById("reconcile-raw-weight")?.value) || 0.0;
+    const initialEquiv = parseFloat(document.getElementById("reconcile-initial-equiv")?.value) || 0.0;
+    const finalCarat = parseInt(document.getElementById("reconcile-final-carat")?.value);
+
+    if (!finalCarat || finalCarat <= 0) {
+        document.getElementById("reconcile-calc-final-gold").textContent = "-- گرم";
+        document.getElementById("reconcile-calc-variance").textContent = "-- گرم";
+        return;
+    }
+
+    const finalEquiv = (weight * finalCarat) / 750;
+    const variance = finalEquiv - initialEquiv;
+
+    document.getElementById("reconcile-calc-final-gold").textContent = `${formatGold(finalEquiv)} گرم`;
+    const varEl = document.getElementById("reconcile-calc-variance");
+    varEl.textContent = `${variance > 0 ? '+' : ''}${formatGold(variance)} گرم`;
+    varEl.className = `font-mono text-sm font-bold ${variance < 0 ? 'text-rose-600' : 'text-emerald-600'}`;
+}
+
+async function confirmAssayReconcile() {
+    const id = document.getElementById("reconcile-assay-id")?.value;
+    const finalCarat = parseInt(document.getElementById("reconcile-final-carat")?.value);
+    const notes = document.getElementById("reconcile-notes")?.value || "";
+
+    if (!finalCarat || finalCarat < 300 || finalCarat > 1000) {
+        showToast("لطفاً عیار قطعی معتبر آزمایشگاه (مثلاً ۷۴۶) را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/assays/${id}/reconcile`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                final_carat: finalCarat,
+                notes: notes
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ثبت جواب ری‌گیری");
+        const resData = await resp.json();
+        closeAssayReconcileModal();
+        showToast(`عیار قطعی ${finalCarat} ثبت و اختلاف وزنی ${formatGold(resData.variance_750)}g در حساب اعمال شد.`, "success");
+        loadAssays();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+// -------------------------------------------------------------
+// 2. Cashify & Goldify Calculations
+// -------------------------------------------------------------
+function updateLiveCashifyCalc() {
+    const weight = parseFloat(document.getElementById("cashify-weight")?.value) || 0.0;
+    const mazane = parseFloat(document.getElementById("cashify-mazane")?.value) || 0.0;
+
+    if (mazane <= 0) return;
+
+    const gramPrice = Math.round(mazane / MAZANE_DIVISOR);
+    const totalToman = Math.round(weight * gramPrice);
+
+    const priceEl = document.getElementById("cashify-gram-price");
+    if (priceEl) priceEl.textContent = `${gramPrice.toLocaleString('fa-IR')} تومان`;
+
+    const totalEl = document.getElementById("cashify-total-toman");
+    if (totalEl) totalEl.textContent = `${totalToman.toLocaleString('fa-IR')} تومان`;
+}
+
+async function submitCashify() {
+    const weight = parseFloat(document.getElementById("cashify-weight")?.value);
+    const mazane = parseFloat(document.getElementById("cashify-mazane")?.value);
+    const party = parseInt(document.getElementById("cashify-party")?.value) || null;
+
+    if (!weight || weight <= 0 || !mazane || mazane <= 0) {
+        showToast("لطفاً وزن طلا و مظنه روز را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/cashify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                date_shamsi: "1405/07/29",
+                counterparty_id: party,
+                gold_weight_750: weight,
+                mazane_rate: mazane,
+                notes: "پولی کردن طلا طبق مظنه بازار"
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ثبت پولی کردن");
+        const res = await resp.json();
+        showToast(`پولی‌کردن طلا با موفقیت انجام شد: ${res.toman_amount.toLocaleString('fa-IR')} تومان.`, "success");
+        populateCounterpartyDropdowns();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+function updateLiveGoldifyCalc() {
+    const toman = parseFloat(document.getElementById("goldify-toman")?.value) || 0.0;
+    const mazane = parseFloat(document.getElementById("goldify-mazane")?.value) || 0.0;
+
+    if (mazane <= 0 || toman <= 0) return;
+
+    const gramPrice = mazane / MAZANE_DIVISOR;
+    const goldEquiv = toman / gramPrice;
+
+    const resEl = document.getElementById("goldify-result-gold");
+    if (resEl) resEl.textContent = `${formatGold(goldEquiv)} گرم`;
+}
+
+async function submitGoldify() {
+    const toman = parseFloat(document.getElementById("goldify-toman")?.value);
+    const mazane = parseFloat(document.getElementById("goldify-mazane")?.value);
+    const party = parseInt(document.getElementById("goldify-party")?.value) || null;
+
+    if (!toman || toman <= 0 || !mazane || mazane <= 0) {
+        showToast("لطفاً مبلغ تومان و مظنه روز را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/goldify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                date_shamsi: "1405/07/29",
+                counterparty_id: party,
+                toman_amount: toman,
+                mazane_rate: mazane,
+                notes: "طلایی کردن وجه/اجرت بر مبنای مظنه روز"
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ثبت طلایی کردن");
+        const res = await resp.json();
+        showToast(`طلایی‌کردن با موفقیت ثبت شد: معادل ${formatGold(res.gold_weight_750)} گرم طلا ۷۵۰.`, "success");
+        populateCounterpartyDropdowns();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+// -------------------------------------------------------------
+// 3. Ras-giri & Scissor Tool
+// -------------------------------------------------------------
+function addRasGiriRow() {
+    const tbody = document.getElementById("rasgiri-table-body");
+    if (!tbody) return;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td><input type="text" placeholder="عنوان فاکتور / چک" class="p-1 rounded border border-[var(--border-color)] text-xs w-full dilan-input"></td>
+        <td><input type="number" step="0.001" value="50.000" oninput="calculateLiveRasGiri()" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-amt"></td>
+        <td><input type="number" value="15" oninput="calculateLiveRasGiri()" class="p-1 rounded border border-[var(--border-color)] text-xs font-mono text-center w-full dilan-input ras-day"></td>
+        <td class="text-center"><button onclick="this.closest('tr').remove(); calculateLiveRasGiri();" class="text-rose-500 font-bold">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateLiveRasGiri();
+}
+
+function calculateLiveRasGiri() {
+    const amtInputs = document.querySelectorAll(".ras-amt");
+    const dayInputs = document.querySelectorAll(".ras-day");
+
+    let totalAmount = 0.0;
+    let weightedSum = 0.0;
+
+    for (let i = 0; i < amtInputs.length; i++) {
+        const amt = parseFloat(amtInputs[i].value) || 0.0;
+        const day = parseFloat(dayInputs[i].value) || 0.0;
+        totalAmount += amt;
+        weightedSum += (amt * day);
+    }
+
+    const badge = document.getElementById("rasgiri-result-badge");
+    if (!badge) return;
+
+    if (totalAmount <= 0) {
+        badge.textContent = "۰.۰ روز";
+        return;
+    }
+
+    const avgDays = (weightedSum / totalAmount).toFixed(1);
+    badge.textContent = `${formatDigits(avgDays)} روز`;
+}
+
+async function submitScissorTransfer() {
+    const txId = parseInt(document.getElementById("scissor-tx-id")?.value);
+    const sourceParty = parseInt(document.getElementById("scissor-source-party")?.value);
+    const targetParty = parseInt(document.getElementById("scissor-target-party")?.value);
+    const reason = document.getElementById("scissor-reason")?.value.trim() || "";
+
+    if (!txId || !sourceParty || !targetParty) {
+        showToast("لطفاً شناسه سند، طرف‌حساب مبدا و طرف‌حساب مقصد را مشخص کنید.", "danger");
+        return;
+    }
+
+    if (sourceParty === targetParty) {
+        showToast("طرف‌حساب مبدا و مقصد نمی‌توانند یکسان باشند.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/scissor`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                date_shamsi: "1405/07/29",
+                transaction_id: txId,
+                source_counterparty_id: sourceParty,
+                target_counterparty_id: targetParty,
+                reason: reason
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در اجرای عملیات قیچی سند");
+        showToast("سند با موفقیت قیچی و به حساب شخص مقصد منتقل شد.", "success");
+        document.getElementById("scissor-tx-id").value = "";
+        document.getElementById("scissor-reason").value = "";
+        populateCounterpartyDropdowns();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+// -------------------------------------------------------------
+// 4. POS, Banking & Checks Portfolio
+// -------------------------------------------------------------
+async function loadBankAndPosAccounts() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/accounts`);
+        if (!resp.ok) return;
+        const accounts = await resp.json();
+
+        const grid = document.getElementById("bank-accounts-grid");
+        if (!grid) return;
+        grid.innerHTML = "";
+
+        accounts.forEach(acc => {
+            const isLoan = acc.account_type === "loan";
+            const isPos = acc.account_type === "pos";
+            const card = document.createElement("div");
+            card.className = "dilan-card p-4 space-y-2 border-r-4 " + (isLoan ? "border-rose-500" : (isPos ? "border-sky-500" : "border-emerald-500"));
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-[var(--text-primary)]">${acc.account_title}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isLoan ? 'bg-rose-500/10 text-rose-600' : (isPos ? 'bg-sky-500/10 text-sky-600' : 'bg-emerald-500/10 text-emerald-600')}">
+                        ${isLoan ? 'وام بانکی' : (isPos ? 'کارتخوان پوز' : 'حساب جاری')}
+                    </span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-[var(--text-muted)]">موجودی / مانده:</span>
+                    <span class="font-mono font-black text-sm ${isLoan ? 'text-rose-600' : 'text-emerald-600'}">
+                        ${Math.round(acc.balance_irr).toLocaleString('fa-IR')} ریال
+                    </span>
+                </div>
+                <div class="flex justify-between items-center text-[11px] text-[var(--text-muted)] border-t border-[var(--border-color)] pt-1.5">
+                    <span>تشخیص: ${acc.diagnosis}</span>
+                    <span class="font-mono">${acc.pos_terminal_id || acc.card_or_sheba || acc.bank_name}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        console.error("Error loading bank accounts:", err);
+    }
+}
+
+function openAddAccountModal() {
+    const modal = document.getElementById("modal-add-bank-account");
+    if (modal) modal.classList.remove("hidden");
+}
+
+function closeAddAccountModal() {
+    const modal = document.getElementById("modal-add-bank-account");
+    if (modal) modal.classList.add("hidden");
+}
+
+async function submitNewBankAccount() {
+    const title = document.getElementById("newacc-title")?.value.trim();
+    const type = document.getElementById("newacc-type")?.value;
+    const bank = document.getElementById("newacc-bank")?.value.trim();
+    const sheba = document.getElementById("newacc-sheba")?.value.trim() || "";
+    const terminal = document.getElementById("newacc-terminal")?.value.trim() || "";
+    const balance = parseFloat(document.getElementById("newacc-balance")?.value) || 0.0;
+    const diag = document.getElementById("newacc-diagnosis")?.value;
+    const notes = document.getElementById("newacc-notes")?.value.trim() || "";
+
+    if (!title || !bank) {
+        showToast("لطفاً عنوان حساب و نام بانک را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/accounts`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                account_title: title,
+                account_type: type,
+                bank_name: bank,
+                card_or_sheba: sheba,
+                pos_terminal_id: terminal,
+                balance_irr: balance,
+                diagnosis: diag,
+                notes: notes
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ایجاد حساب");
+        closeAddAccountModal();
+        showToast(`حساب "${title}" با موفقیت افتتاح و ثبت شد.`, "success");
+        loadBankAndPosAccounts();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+async function loadChecksPortfolio() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/checks`);
+        if (!resp.ok) return;
+        const checks = await resp.json();
+
+        const tbody = document.getElementById("checks-table-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        checks.forEach(chk => {
+            const isReceived = chk.check_direction === "received";
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isReceived ? 'bg-sky-500/10 text-sky-600' : 'bg-purple-500/10 text-purple-600'}">
+                        ${isReceived ? 'دریافتی' : 'شخصی صادره'}
+                    </span>
+                </td>
+                <td class="font-mono text-center font-bold tracking-wider">${chk.sayad_id || '---'}</td>
+                <td>${chk.bank_name}</td>
+                <td class="font-bold">${chk.drawer_name}</td>
+                <td>${chk.payee_name || 'در وجه حامل'}</td>
+                <td class="font-mono font-bold text-center">${Math.round(chk.amount_irr).toLocaleString('fa-IR')}</td>
+                <td class="font-mono text-center">${chk.due_date_shamsi}</td>
+                <td>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${chk.status === 'نزد_صندوق' ? 'bg-amber-500/10 text-amber-600' : (chk.status === 'پاس_شده' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-blue-500/10 text-blue-600')}">
+                        ${chk.status}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <select onchange="changeCheckStatus(${chk.id}, this.value)" class="p-1 rounded border border-[var(--border-color)] text-[11px] font-bold dilan-input">
+                        <option value="نزد_صندوق" ${chk.status === 'نزد_صندوق' ? 'selected' : ''}>نزد صندوق</option>
+                        <option value="خوابانده_به_حساب" ${chk.status === 'خوابانده_به_حساب' ? 'selected' : ''}>خوابانده به حساب</option>
+                        <option value="پاس_شده" ${chk.status === 'پاس_شده' ? 'selected' : ''}>پاس شد (وصول)</option>
+                        <option value="برگشتی" ${chk.status === 'برگشتی' ? 'selected' : ''}>برگشت خورد</option>
+                    </select>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Error loading checks:", err);
+    }
+}
+
+function openAddCheckModal() {
+    const modal = document.getElementById("modal-add-check");
+    if (modal) modal.classList.remove("hidden");
+}
+
+function closeAddCheckModal() {
+    const modal = document.getElementById("modal-add-check");
+    if (modal) modal.classList.add("hidden");
+}
+
+async function submitNewCheck() {
+    const dir = document.getElementById("newchk-direction")?.value;
+    const sayad = document.getElementById("newchk-sayad")?.value.trim() || "";
+    const bank = document.getElementById("newchk-bank")?.value.trim();
+    const serial = document.getElementById("newchk-serial")?.value.trim() || "";
+    const due = document.getElementById("newchk-due-date")?.value.trim();
+    const drawer = document.getElementById("newchk-drawer")?.value.trim();
+    const payee = document.getElementById("newchk-payee")?.value.trim() || "";
+    const amount = parseFloat(document.getElementById("newchk-amount")?.value);
+    const party = parseInt(document.getElementById("newchk-party")?.value) || null;
+    const notes = document.getElementById("newchk-notes")?.value.trim() || "";
+
+    if (!bank || !drawer || !due || !amount || amount <= 0) {
+        showToast("لطفاً نام بانک، صادرکننده، سررسید و مبلغ چک را وارد کنید.", "danger");
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/checks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                check_direction: dir,
+                sayad_id: sayad,
+                serial_no: serial,
+                bank_name: bank,
+                branch_name: "",
+                drawer_name: drawer,
+                payee_name: payee,
+                counterparty_id: party,
+                amount_irr: amount,
+                due_date_shamsi: due,
+                status: "نزد_صندوق",
+                notes: notes
+            })
+        });
+
+        if (!resp.ok) throw new Error("خطا در ثبت چک");
+        closeAddCheckModal();
+        showToast("چک با موفقیت در سبد چک‌های صیادی ثبت گردید.", "success");
+        loadChecksPortfolio();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}
+
+async function changeCheckStatus(id, newStatus) {
+    try {
+        const resp = await fetch(`${API_BASE}/api/market/checks/${id}/status?new_status=${encodeURIComponent(newStatus)}`, {
+            method: "PUT"
+        });
+        if (!resp.ok) throw new Error("خطا در تغییر وضعیت چک");
+        showToast(`وضعیت چک به "${newStatus}" تغییر یافت.`, "info");
+        loadChecksPortfolio();
+    } catch (err) {
+        showToast(err.message, "danger");
+    }
+}

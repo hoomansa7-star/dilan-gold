@@ -118,9 +118,9 @@ function switchMainTab(tabId) {
         const btn = document.getElementById(`tab-btn-${t}`);
         if (!btn) return;
         if (t === tabId) {
-            btn.className = "main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs bg-amber-600 text-white transition-all shadow-sm shrink-0";
+            btn.className = "main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-amber-600 to-amber-500 text-white transition-all shadow-md shadow-amber-500/20 shrink-0";
         } else {
-            btn.className = "main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0";
+            btn.className = "main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0";
         }
     });
 
@@ -597,6 +597,7 @@ function toggleNightMode() {
 document.addEventListener("DOMContentLoaded", () => {
     renderWorkshopTable();
     updateTopMetrics();
+    updatePersianLiveDate();
     lucide.createIcons();
     // Pre-calculate solder
     runSolderCalculation();
@@ -1884,3 +1885,65 @@ async function changeCheckStatus(id, newStatus) {
         showToast(err.message, "danger");
     }
 }
+
+
+// =========================================================================
+// LUXURY SUITE EXTENSIONS: THERMAL RECEIPT & KEYBOARD F-KEYS
+// =========================================================================
+
+function openThermalReceiptModal() {
+    const modal = document.getElementById("modal-thermal-receipt");
+    if (modal) {
+        modal.classList.remove("hidden");
+        lucide.createIcons();
+    }
+}
+
+function closeThermalReceiptModal() {
+    const modal = document.getElementById("modal-thermal-receipt");
+    if (modal) modal.classList.add("hidden");
+}
+
+function updatePersianLiveDate() {
+    const el = document.getElementById("current-persian-date");
+    if (el) {
+        try {
+            const now = new Date();
+            const formatter = new Intl.DateTimeFormat('fa-IR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            el.innerText = formatter.format(now);
+        } catch (e) {
+            el.innerText = "چهارشنبه ۲۹ مهر ۱۴۰۵";
+        }
+    }
+}
+
+// Global Keyboard Navigation (F1 to F9 and Escape)
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        document.querySelectorAll("[id^='modal-']").forEach(m => m.classList.add("hidden"));
+        return;
+    }
+
+    const fKeys = {
+        "F1": "daily-ledger",
+        "F2": "workshop-matrix",
+        "F3": "bench-quickpad",
+        "F4": "melting-calc",
+        "F5": "craftsmen-payroll",
+        "F6": "crucible-refining",
+        "F7": "assay-manager",
+        "F8": "market-clearing",
+        "F9": "pos-banking"
+    };
+
+    if (fKeys[e.key]) {
+        e.preventDefault();
+        switchMainTab(fKeys[e.key]);
+        showToast(`انتقال به بخش: ${fKeys[e.key]}`, "info");
+    }
+});

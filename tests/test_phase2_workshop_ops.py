@@ -9,7 +9,12 @@ Unit tests for Phase 2 workshop operations:
 """
 
 import unittest
+import os
+import sys
 from decimal import Decimal, ROUND_HALF_UP
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from server.routes.workshop import calculate_solder, SolderCalcRequest
 
 

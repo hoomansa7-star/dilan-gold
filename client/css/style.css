@@ -1,6 +1,12 @@
-/* Dilan Gold ERP - Modern Jewelry Workshop System (سامانه مدرن کارگاهی طلای دیلان) */
+/* ==========================================================================
+   Dilan Gold ERP - Luxury Financial & Metallurgical Design System
+   سامانه مهندسی و مدیریت کارگاهی طلای دیلان - استانداردهای طراحی فوق لوکس
+   Pivoted on DESIGN.md & .agent/rules/design-strictness.md
+   ========================================================================== */
 
-/* Local Premium Persian Webfonts */
+/* --------------------------------------------------------------------------
+   1. Typography & Persian Webfonts (استعداد و لاله‌زار)
+   -------------------------------------------------------------------------- */
 @font-face {
     font-family: 'Estedad';
     src: url('../fonts/Estedad-Regular.woff2') format('woff2');
@@ -49,45 +55,113 @@
     font-display: swap;
 }
 
+/* --------------------------------------------------------------------------
+   2. Design Tokens - 60-30-10 Luxury Metallurgy Color Palette
+   -------------------------------------------------------------------------- */
 :root {
+    /* 60% Canvas / Surface */
     --bg-page: #F8FAFC;
+    --bg-page-subtle: #F1F5F9;
     --bg-card: #FFFFFF;
-    --bg-card-subtle: #F1F5F9;
+    --bg-card-subtle: #F8FAFC;
+    --bg-card-elevated: #FFFFFF;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+
+    /* Borders (Ultra-crisp 1px borders, zero blurry muddy shadows) */
     --border-color: #E2E8F0;
     --border-color-subtle: #CBD5E1;
+    --border-color-highlight: rgba(217, 119, 6, 0.35);
+
+    /* Text Hierarchy */
     --text-primary: #0F172A;
-    --text-secondary: #475569;
+    --text-secondary: #334155;
     --text-muted: #64748B;
+    --text-inverted: #FFFFFF;
+
+    /* 10% Gold Metallurgy Accents */
     --gold-primary: #D97706;
     --gold-dark: #B45309;
     --gold-light: #FEF3C7;
+    --gold-glow: rgba(217, 119, 6, 0.15);
+    --gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+
+    /* Semantic Status Indicators */
     --accent-emerald: #059669;
+    --accent-emerald-bg: #ECFDF5;
+    --accent-emerald-border: #A7F3D0;
+    
     --loss-red: #E11D48;
     --loss-red-bg: #FFF1F2;
     --loss-red-border: #FECDD3;
+
+    --info-blue: #0284C7;
+    --info-blue-bg: #F0F9FF;
+    --info-blue-border: #BAE6FD;
+
+    /* Spacing & Radii Tokens (4pt/8pt scale) */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.03);
+    --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    --shadow-gold: 0 4px 14px 0 rgba(217, 119, 6, 0.25);
 }
 
+/* Dark Mode - Obsidian Matte Luxury (نه گرادیان‌های کلیشه‌ای بنفش هوش مصنوعی) */
 body.dark {
     --bg-page: #0B0F17;
+    --bg-page-subtle: #080C12;
     --bg-card: #151C28;
-    --bg-card-subtle: #1E293B;
-    --border-color: #2D3748;
-    --border-color-subtle: #334155;
+    --bg-card-subtle: #1A2332;
+    --bg-card-elevated: #1E293B;
+    --bg-glass: rgba(21, 28, 40, 0.85);
+
+    --border-color: #263345;
+    --border-color-subtle: #1E2A3A;
+    --border-color-highlight: rgba(245, 158, 11, 0.4);
+
     --text-primary: #F8FAFC;
     --text-secondary: #CBD5E1;
     --text-muted: #94A3B8;
+    --text-inverted: #0F172A;
+
     --gold-primary: #F59E0B;
     --gold-dark: #FBBF24;
     --gold-light: #2C2210;
+    --gold-glow: rgba(245, 158, 11, 0.15);
+    --gold-gradient: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+
     --accent-emerald: #10B981;
+    --accent-emerald-bg: #064E3B;
+    --accent-emerald-border: #047857;
+
     --loss-red: #FB7185;
-    --loss-red-bg: #2A1215;
-    --loss-red-border: #4C1D24;
+    --loss-red-bg: #3B1219;
+    --loss-red-border: #881337;
+
+    --info-blue: #38BDF8;
+    --info-blue-bg: #0C4A6E;
+    --info-blue-border: #0369A1;
+
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.4), 0 25px 35px -5px rgba(0, 0, 0, 0.6);
+    --shadow-gold: 0 4px 16px 0 rgba(245, 158, 11, 0.25);
 }
 
+/* --------------------------------------------------------------------------
+   3. Global Reset & Base Setup
+   -------------------------------------------------------------------------- */
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -99,14 +173,17 @@ body {
     min-height: 100vh;
     font-family: 'Estedad', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
     transition: background-color 0.2s ease, color 0.2s ease;
+    overflow-x: hidden;
 }
 
+/* Headings in Lalezar */
 h1, h2, h3, .font-heading {
     font-family: 'Lalezar', 'Estedad', sans-serif !important;
     letter-spacing: 0;
+    font-weight: 400;
 }
 
-/* Tabular Persian Numbers */
+/* Tabular Numerals for Financial & Gold Metallurgy (ارقام بدون لغزش ستونی) */
 .font-mono, .tnum, td.font-mono, span.font-mono, div.font-mono, button.font-mono, input.font-mono {
     font-family: 'Estedad', monospace, sans-serif !important;
     font-variant-numeric: tabular-nums;
@@ -114,150 +191,199 @@ h1, h2, h3, .font-heading {
     font-weight: 700;
 }
 
-/* Modern Card */
+/* --------------------------------------------------------------------------
+   4. Glassmorphism & Card System
+   -------------------------------------------------------------------------- */
 .dilan-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-/* Inputs & Selects */
-.dilan-input, .dilan-select {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
+.dilan-card-elevated {
+    background-color: var(--bg-card-elevated);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 0.88rem;
-    font-weight: 600;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-elevated);
+}
+
+.dilan-glass {
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+}
+
+/* --------------------------------------------------------------------------
+   5. Interactive Micro-Interactions (Tactile Buttons & Inputs)
+   -------------------------------------------------------------------------- */
+button, .btn {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+button:active:not(:disabled), .btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: none;
+    box-shadow: 0 0 0 2px var(--bg-page), 0 0 0 4px var(--gold-primary);
+}
+
+.btn-gold {
+    background: var(--gold-gradient);
+    color: #FFFFFF;
+    font-weight: 700;
+    border: none;
+    box-shadow: var(--shadow-gold);
+}
+
+.btn-gold:hover {
+    filter: brightness(1.08);
+}
+
+.btn-outline-gold {
+    background: transparent;
+    color: var(--gold-primary);
+    border: 1px solid var(--gold-primary);
+}
+
+.btn-outline-gold:hover {
+    background: var(--gold-glow);
+}
+
+/* Form Inputs */
+.dilan-input {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    padding: 0.55rem 0.85rem;
+    font-size: 0.8125rem;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.dilan-input:focus, .dilan-select:focus {
+.dilan-input:focus {
     border-color: var(--gold-primary);
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--gold-glow);
 }
 
-/* Modern Clean Table */
+/* Navigation Tabs */
+.nav-tab-active {
+    background: var(--gold-gradient) !important;
+    color: #FFFFFF !important;
+    box-shadow: var(--shadow-gold) !important;
+    border-color: transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. Custom Data Tables (Sticky Headers & Zebra Stripes)
+   -------------------------------------------------------------------------- */
+.dilan-table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+}
+
 .dilan-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    font-size: 0.8125rem;
 }
 
-.dilan-table th {
+.dilan-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     background-color: var(--bg-card-subtle);
     color: var(--text-secondary);
-    font-weight: 800;
-    font-size: 0.8rem;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
     text-align: right;
-    white-space: nowrap;
 }
 
-.dilan-table td {
-    padding: 12px 14px;
+.dilan-table tbody td {
+    padding: 0.65rem 0.85rem;
     border-bottom: 1px solid var(--border-color);
-    font-size: 0.88rem;
-    vertical-align: middle;
+    color: var(--text-primary);
+    transition: background-color 0.1s ease;
 }
 
-.dilan-table tbody tr:hover {
-    background-color: rgba(217, 119, 6, 0.03);
+.dilan-table tbody tr:hover td {
+    background-color: var(--gold-glow) !important;
 }
 
-body.dark .dilan-table tbody tr:hover {
-    background-color: rgba(245, 158, 11, 0.05);
+.dilan-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
-/* Loss Badges */
-.loss-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 10px;
-    border-radius: 6px;
-    background-color: var(--loss-red-bg);
-    border: 1px solid var(--loss-red-border);
-    color: var(--loss-red);
-    font-weight: 800;
-    font-family: 'Estedad', monospace, sans-serif;
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum" 1;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    line-height: 1.4;
+/* --------------------------------------------------------------------------
+   7. Live Ticker Animation (نوار مظنه زنده بازار)
+   -------------------------------------------------------------------------- */
+@keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.96); }
 }
 
-/* Worker Badges */
-.worker-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 800;
-    font-size: 0.85rem;
+.ticker-pulse {
+    animation: pulseGlow 2.5s infinite ease-in-out;
 }
 
-.worker-avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.72rem;
-    font-weight: 900;
-    color: white;
-}
-
-.avatar-nima { background-color: #0284C7; }
-.avatar-amir { background-color: #D97706; }
-.avatar-ata { background-color: #7C3AED; }
-.avatar-other { background-color: #475569; }
-
-/* Stage Badges */
-.stage-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.stage-skin { background-color: #FEF3C7; color: #92400E; }
-.stage-polish { background-color: #DBEAFE; color: #1E40AF; }
-.stage-melting { background-color: #FFEDD5; color: #9A3412; }
-.stage-rolling { background-color: #F1F5F9; color: #334155; }
-.stage-laser { background-color: #F3E8FF; color: #6B21A8; }
-.stage-melgat { background-color: #CCFBF1; color: #115E59; }
-.stage-stripping { background-color: #E0F2FE; color: #075985; }
-.stage-swarf { background-color: #FFE4E6; color: #9F1239; }
-.stage-wire { background-color: #D1FAE5; color: #065F46; }
-
-body.dark .stage-skin { background-color: #382405; color: #FCD34D; }
-body.dark .stage-polish { background-color: #172554; color: #93C5FD; }
-body.dark .stage-melting { background-color: #431407; color: #FDBA74; }
-body.dark .stage-rolling { background-color: #1E293B; color: #CBD5E1; }
-body.dark .stage-laser { background-color: #3B0764; color: #D8B4FE; }
-body.dark .stage-melgat { background-color: #042F2E; color: #5EEAD4; }
-body.dark .stage-stripping { background-color: #082F49; color: #7DD3FC; }
-body.dark .stage-swarf { background-color: #4C0519; color: #FDA4AF; }
-body.dark .stage-wire { background-color: #022C22; color: #6EE7B7; }
-
-/* Custom Scrollbar */
+/* --------------------------------------------------------------------------
+   8. Custom Scrollbars
+   -------------------------------------------------------------------------- */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: var(--bg-page);
 }
+
 ::-webkit-scrollbar-thumb {
     background: var(--border-color);
-    border-radius: 4px;
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-primary);
+}
+
+/* --------------------------------------------------------------------------
+   9. Print Hygiene: Support for both A4/A5 and 80mm Thermal Receipt (فیش پرینتر)
+   -------------------------------------------------------------------------- */
+@media print {
+    body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        padding: 0 !important;
+    }
+
+    header, nav, #toast-container, .no-print, button, .btn, .dilan-ticker {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    /* 80mm Thermal Roll Paper Standard (فرمت اختصاصی فیش پرینتر زرگری) */
+    .thermal-receipt {
+        width: 78mm !important;
+        max-width: 78mm !important;
+        margin: 0 auto !important;
+        padding: 4mm !important;
+        font-size: 11px !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
 }

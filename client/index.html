@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سامانه کارگاهی طلای دیلان | ردیابی کسری خط تولید</title>
+    <title>سامانه جامع زرگری و کارگاهی طلای دیلان | ردیابی کسری، عیارسنجی و ته‌حساب بازار</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,8 +11,8 @@
             darkMode: 'class'
         }
     </script>
-    <!-- Modern Clean Styles -->
-    <link rel="stylesheet" href="/static/css/style.css?v=5">
+    <!-- Luxury Metallurgy Design System Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css?v=6">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -21,90 +21,139 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-4 left-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-auto"></div>
 
+    <!-- Top Executive Gold Market Ticker (نوار مظنه زنده بازار و شاخص‌های مالی) -->
+    <div class="dilan-glass rounded-xl px-4 py-2 border border-[var(--border-color)] flex items-center justify-between text-xs overflow-x-auto gap-4 no-print shadow-sm">
+        <div class="flex items-center gap-3 shrink-0">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20 text-[11px]">
+                <span class="w-2 h-2 rounded-full bg-amber-500 ticker-pulse"></span>
+                <span>بازار زنده طلا</span>
+            </span>
+            <div class="flex items-center gap-1 font-bold text-[var(--text-secondary)]">
+                <span>مظنه آبشده ۱۷ (مثقال):</span>
+                <span id="ticker-mazaneh" class="font-mono text-amber-600 dark:text-amber-400 font-black">۴۱,۸۵۰,۰۰۰</span>
+                <span class="text-[10px] text-[var(--text-muted)]">تومان</span>
+            </div>
+            <span class="text-[var(--border-color)]">|</span>
+            <div class="flex items-center gap-1 font-bold text-[var(--text-secondary)]">
+                <span>هر گرم ۱۸ عیار (۷۵۰):</span>
+                <span id="ticker-gram-18" class="font-mono text-amber-600 dark:text-amber-400 font-black">۹,۶۶۰,۰۰۰</span>
+                <span class="text-[10px] text-[var(--text-muted)]">تومان</span>
+            </div>
+            <span class="text-[var(--border-color)]">|</span>
+            <div class="flex items-center gap-1 font-bold text-[var(--text-secondary)]">
+                <span>انس جهانی:</span>
+                <span class="font-mono font-black text-emerald-600 dark:text-emerald-400">$2,735.40</span>
+            </div>
+            <span class="text-[var(--border-color)]">|</span>
+            <div class="flex items-center gap-1 font-bold text-[var(--text-secondary)]">
+                <span>دلار آزاد:</span>
+                <span class="font-mono font-black text-blue-600 dark:text-blue-400">۶۸,۵۰۰</span>
+                <span class="text-[10px] text-[var(--text-muted)]">تومان</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0 font-bold text-xs">
+            <div class="flex items-center gap-1.5 bg-[var(--bg-card-subtle)] px-2.5 py-1 rounded-lg border border-[var(--border-color)]">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i>
+                <span class="text-[11px] text-[var(--text-muted)]">وضعیت شاپرک:</span>
+                <span class="text-emerald-600 dark:text-emerald-400 text-[11px]">متصل (T+1)</span>
+            </div>
+            <div class="hidden md:flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
+                <kbd class="px-1.5 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border-color)] font-mono text-[10px]">F1-F9</kbd>
+                <span>کلیدهای میانبر</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Header Bar (سربرگ مدرن سامانه دیلان) -->
-    <header class="dilan-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <header class="dilan-card dilan-glass p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-[var(--border-color)] shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-amber-600 flex items-center justify-center font-heading text-white text-2xl shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-500 flex items-center justify-center font-heading text-white text-3xl shadow-md shadow-amber-500/20 border border-amber-400/30">
                 د
             </div>
             <div>
-                <h1 class="text-xl font-heading text-[var(--text-primary)] leading-tight">
-                    کارگاه طلای دیلان
-                </h1>
-                <p class="text-xs text-[var(--text-muted)] font-medium">ردیابی وزن، کارگران و کنترل کسری ۹ مرحله تولید طلا</p>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-heading text-[var(--text-primary)] leading-tight">
+                        سامانه جامع زرگری و کارگاهی طلای دیلان
+                    </h1>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">نسخه مهندسی ۳.۰</span>
+                </div>
+                <p class="text-xs text-[var(--text-muted)] font-medium mt-0.5">کنترل متالورژی ذوب، ردیابی کسری خط تولید، آزمایشگاه ری‌گیری و ته‌حساب بازار</p>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
             <!-- Current Date Badge -->
-            <div class="flex items-center gap-2 bg-[var(--bg-card-subtle)] border border-[var(--border-color)] px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--text-primary)]">
+            <div class="flex items-center gap-2 bg-[var(--bg-card-subtle)] border border-[var(--border-color)] px-3 py-2 rounded-xl text-xs font-bold text-[var(--text-primary)]">
                 <i data-lucide="calendar" class="w-4 h-4 text-amber-600"></i>
-                <span>چهارشنبه ۲۹ مهر ۱۴۰۵</span>
+                <span id="current-persian-date">چهارشنبه ۲۹ مهر ۱۴۰۵</span>
             </div>
 
             <!-- Reconciliation Modal Trigger -->
-            <button onclick="openNightlyAuditModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
+            <button onclick="openNightlyAuditModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all shadow-sm">
                 <i data-lucide="scale" class="w-4 h-4 text-emerald-600"></i>
                 <span>تطبیق تراز روز</span>
             </button>
 
+            <!-- Thermal Receipt 80mm Modal Trigger (طرح فیش پرینتر زرگر موبایل) -->
+            <button onclick="openThermalReceiptModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all shadow-sm" title="پیش‌نمایش فیش پرینتر ۸۰ میلی‌متری">
+                <i data-lucide="printer" class="w-4 h-4 text-amber-600"></i>
+                <span>فیش‌پرینتر حرارتی</span>
+            </button>
+
             <!-- Export Excel -->
-            <button onclick="exportShiftExcel()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-amber-500 transition-all text-[var(--text-primary)]">
+            <button onclick="exportShiftExcel()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-amber-500 transition-all text-[var(--text-primary)] shadow-sm">
                 <i data-lucide="download" class="w-4 h-4 text-amber-600"></i>
                 <span>خروجی اکسل</span>
             </button>
 
             <!-- Dark Mode Toggle -->
-            <button onclick="toggleNightMode()" class="w-8 h-8 rounded-lg border border-[var(--border-color)] flex items-center justify-center bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-amber-500 transition-colors" title="حالت شب / روز">
+            <button onclick="toggleNightMode()" class="w-9 h-9 rounded-xl border border-[var(--border-color)] flex items-center justify-center bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-amber-500 transition-colors shadow-sm" title="حالت شب / روز">
                 <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Navigation Tabs (سامانه جامع ۶ بخشی کارگاه طلای دیلان) -->
-    <nav class="flex items-center gap-2 border-b border-[var(--border-color)] pb-1 overflow-x-auto">
-        <button onclick="switchMainTab('daily-ledger')" id="tab-btn-daily-ledger" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs bg-amber-600 text-white transition-all shadow-sm shrink-0">
+    <!-- Main Navigation Tabs (سامانه جامع ۹ بخشی کارگاه طلای دیلان) -->
+    <nav class="flex items-center gap-2 border-b border-[var(--border-color)] pb-2 overflow-x-auto no-print">
+        <button onclick="switchMainTab('daily-ledger')" id="tab-btn-daily-ledger" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-amber-600 to-amber-500 text-white transition-all shadow-md shadow-amber-500/20 shrink-0">
             <i data-lucide="book-open" class="w-4 h-4"></i>
-            <span>۱. دفتر شیفت کارگاه (جریان روزانه)</span>
+            <span>۱. دفتر شیفت کارگاه (F1)</span>
         </button>
-        <button onclick="switchMainTab('workshop-matrix')" id="tab-btn-workshop-matrix" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('workshop-matrix')" id="tab-btn-workshop-matrix" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="layout-grid" class="w-4 h-4"></i>
-            <span>۲. جدول مراحل تولید (طرح همکار)</span>
+            <span>۲. جدول مراحل تولید (F2)</span>
         </button>
-        <button onclick="switchMainTab('bench-quickpad')" id="tab-btn-bench-quickpad" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('bench-quickpad')" id="tab-btn-bench-quickpad" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
-            <span>۳. ثبت سریع پای میز کار (Bench Pad)</span>
+            <span>۳. ثبت پای میز کار (F3)</span>
         </button>
-        <button onclick="switchMainTab('melting-calc')" id="tab-btn-melting-calc" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('melting-calc')" id="tab-btn-melting-calc" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="flame" class="w-4 h-4"></i>
-            <span>۴. ماشین‌حساب ذوب ۴ شمش و بار</span>
+            <span>۴. ذوب و ۴ شمش (F4)</span>
         </button>
-        <button onclick="switchMainTab('craftsmen-payroll')" id="tab-btn-craftsmen-payroll" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('craftsmen-payroll')" id="tab-btn-craftsmen-payroll" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
-            <span>۵. کارکرد و تسویه پرسنل</span>
+            <span>۵. کارکرد پرسنل (F5)</span>
         </button>
-        <button onclick="switchMainTab('crucible-refining')" id="tab-btn-crucible-refining" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('crucible-refining')" id="tab-btn-crucible-refining" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="beaker" class="w-4 h-4"></i>
-            <span>۶. بوته، لحیم و قالکاری</span>
+            <span>۶. بوته و قالکاری (F6)</span>
         </button>
-        <button onclick="switchMainTab('assay-manager')" id="tab-btn-assay-manager" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('assay-manager')" id="tab-btn-assay-manager" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="test-tube" class="w-4 h-4 text-sky-500"></i>
-            <span>۷. ری‌گیری و آبشده شرطی</span>
+            <span>۷. ری‌گیری و پاکت (F7)</span>
         </button>
-        <button onclick="switchMainTab('market-clearing')" id="tab-btn-market-clearing" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('market-clearing')" id="tab-btn-market-clearing" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-500"></i>
-            <span>۸. تسویه بازار (پولی/طلایی و رأس‌گیری)</span>
+            <span>۸. تسویه بازار و رأس‌گیری (F8)</span>
         </button>
-        <button onclick="switchMainTab('pos-banking')" id="tab-btn-pos-banking" class="main-nav-tab flex items-center gap-2 px-3.5 py-2.5 rounded-lg font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
+        <button onclick="switchMainTab('pos-banking')" id="tab-btn-pos-banking" class="main-nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] transition-all shrink-0">
             <i data-lucide="credit-card" class="w-4 h-4 text-purple-500"></i>
-            <span>۹. بانک، پوز شاپرک و چک‌ها</span>
+            <span>۹. بانک، پوز و چک‌ها (F9)</span>
         </button>
     </nav>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 1: دفتر شیفت کارگاه (جریان واقعی روزانه منطبق بر نمونه کار ۱ و ۲) -->
-    <!-- ========================================================================= -->
-    <main id="tab-daily-ledger" class="space-y-4">
+<main id="tab-daily-ledger" class="space-y-4">
         
         <!-- 4 Essential Metrics Cards -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -1981,5 +2030,51 @@
     <script>
         lucide.createIcons();
     </script>
+
+    <!-- Modal: Thermal Receipt 80mm Preview (پیش‌نمایش فیش پرینتر زرگری) -->
+    <div id="modal-thermal-receipt" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 hidden">
+        <div class="dilan-card-elevated max-w-sm w-full p-4 space-y-3 bg-[var(--bg-card)]">
+            <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
+                <span class="font-bold text-xs text-[var(--text-primary)] flex items-center gap-1.5">
+                    <i data-lucide="printer" class="w-4 h-4 text-amber-600"></i>
+                    <span>فیش پرینتر حرارتی زرگری (عرض ۸۰mm)</span>
+                </span>
+                <button type="button" onclick="closeThermalReceiptModal()" class="w-6 h-6 rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-card-subtle)] flex items-center justify-center text-sm font-bold">✕</button>
+            </div>
+            
+            <!-- Receipt Printable Content -->
+            <div id="receipt-preview-content" class="thermal-receipt bg-white text-black p-3 rounded-lg border border-dashed border-gray-300 font-mono text-xs space-y-2 leading-relaxed">
+                <div class="text-center pb-2 border-b border-black space-y-0.5">
+                    <div class="font-black text-sm font-heading">گالری و کارگاه طلای دیلان</div>
+                    <div class="text-[10px]">فاکتور رسمی صنف طلا و جواهر</div>
+                    <div class="text-[9px] text-gray-600">تاریخ: ۱۴۰۵/۰۷/۲۹ - ساعت: ۱۶:۳۰</div>
+                </div>
+                <div class="space-y-1 text-[11px] pt-1">
+                    <div class="flex justify-between"><span>مشتری / همکار:</span><span class="font-bold">بنکداری صرافان</span></div>
+                    <div class="flex justify-between"><span>شرح کالا:</span><span>سرویس گل و نگین ۷۵۰</span></div>
+                    <div class="flex justify-between"><span>وزن ناخالص:</span><span>۲۶.۷۷۰ گرم</span></div>
+                    <div class="flex justify-between"><span>کسر نگین:</span><span>۰.۵۰۰ گرم</span></div>
+                    <div class="flex justify-between font-bold border-t border-dotted border-gray-400 pt-1"><span>وزن خالص طلا:</span><span>۲۶.۲۷۰ گرم</span></div>
+                    <div class="flex justify-between"><span>مظنه روز:</span><span>۴۱,۸۵۰,۰۰۰ تومان</span></div>
+                    <div class="flex justify-between"><span>اجرت ساخت:</span><span>۱۲٪</span></div>
+                    <div class="flex justify-between font-black border-t-2 border-black pt-1 text-xs"><span>مبلغ کل قابل پرداخت:</span><span>۲۷۲,۵۰۰,۰۰۰ تومان</span></div>
+                </div>
+                <div class="text-center pt-2 border-t border-dashed border-gray-400 text-[9px] text-gray-500">
+                    با سپاس از اعتماد شما - کارگاه طلای دیلان
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <button type="button" onclick="window.print()" class="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>چاپ فیش ۸۰mm</span>
+                </button>
+                <button type="button" onclick="closeThermalReceiptModal()" class="py-2 px-3 rounded-xl border border-[var(--border-color)] text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-card-subtle)]">
+                    بستن
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

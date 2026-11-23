@@ -11,6 +11,8 @@ import sys
 
 # Add project root to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Force local SQLite for lightning-fast, zero-network unit tests
+os.environ["DATABASE_URL"] = ""
 
 from server.database import init_db
 from server.routes.market_ops import (

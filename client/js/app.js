@@ -1353,8 +1353,8 @@ async function loadAssays() {
                     ${isPending ? '---' : (a.variance_750 > 0 ? '+' : '') + formatGold(a.variance_750)}
                 </td>
                 <td>${a.counterparty_name || 'تامین‌کننده ناشناس'}</td>
-                <td>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPending ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'}">
+                <td class="whitespace-nowrap text-center">
+                    <span class="inline-block whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-bold ${isPending ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'}">
                         ${isPending ? 'معلق در ری‌گیری' : 'تعیین عیار شده'}
                     </span>
                 </td>
